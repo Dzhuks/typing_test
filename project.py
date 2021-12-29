@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'data/project.ui'
+# Form implementation generated from reading ui file 'project.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -19,7 +19,7 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(20, 100, 751, 441))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(30, 40, 751, 501))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
@@ -57,19 +57,21 @@ class Ui_MainWindow(object):
 "border-color: rgb(255, 255, 0);")
         self.entered_text.setObjectName("entered_text")
         self.verticalLayout.addWidget(self.entered_text)
-        self.verticalLayout.setStretch(0, 3)
         self.verticalLayout.setStretch(1, 1)
         self.verticalLayout.setStretch(2, 3)
         self.timer_label = QtWidgets.QLabel(self.centralwidget)
-        self.timer_label.setGeometry(QtCore.QRect(710, 60, 61, 31))
+        self.timer_label.setGeometry(QtCore.QRect(680, 0, 101, 31))
         font = QtGui.QFont()
         font.setPointSize(18)
         self.timer_label.setFont(font)
         self.timer_label.setStyleSheet("color: rgb(240, 223, 28);")
+        self.timer_label.setAlignment(QtCore.Qt.AlignCenter)
         self.timer_label.setObjectName("timer_label")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
+        self.menubar.setStyleSheet("color: white;\n"
+"")
         self.menubar.setObjectName("menubar")
         self.settings_menu = QtWidgets.QMenu(self.menubar)
         self.settings_menu.setObjectName("settings_menu")

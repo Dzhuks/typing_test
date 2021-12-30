@@ -1,6 +1,6 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel
-from PyQt5.QtWidgets import QInputDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from project import Ui_MainWindow
 import sqlite3
 
@@ -71,16 +71,24 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         username, ok_pressed = QInputDialog.getText(self, "Регистрация", "Введите имя пользователя: ")
         if ok_pressed:
             if username in self.users_id:
-                # TODO: тут нужно вызвать окно с ошибкой
-                pass
-            self.user = username
+                error_message = QMessageBox(self)
+                error_message.setIcon(QMessageBox.Critical)
+                error_message.setText("Пользователь уже существует!")
+                error_message.setInformativeText("Введите другое имя пользователя")
+                error_message.setWindowTitle("Регистрация отменена")
+                error_message.exec_()
+                return
 
+            self.user = username
             con = sqlite3.connect("data/trainer_db.db")
             cur = con.cursor()
             cur.execute(f"INSERT INTO Users(nickname) VALUES('{username}')")
             con.commit()
+            self.users_id[username] = int(cur.execute(f"""
+            SELECT user_id FROM Users
+                WHERE nickname = '{username}'""").fetchall()[0][0])
+            print(self.users_id)
             con.close()
-
 
 
 if __name__ == '__main__':

@@ -10,10 +10,12 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 class MyWidget(QMainWindow, Ui_MainWindow):
     def __init__(self):
-        super(MyWidget, self).__init__()
+        super(MyWidget, self).__init__(QMainWindow, Ui_MainWindow)
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         # остальное без изменений
         self.setupUi(self)
+
+        # связываемся с базой данных trainer_db.db
         self.con = sqlite3.connect("data/trainer_db.db")
 
         self.difficulty_mode = 1  # легкий режим по умолчанию
@@ -21,23 +23,27 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.load_users()
         self.user = "Гость"  # пользователь по умолчанию
 
-        self.theme = "dark"
-        self.set_func()
+        self.theme = "dark"  # тема по умолчанию
+        self.interface_binding()
 
-        self.is_start = False
+        self.is_start = False  # переменная для отслеживания начало печати пользователя
+
+        # Создание таймера для секундомера
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.showTime)
-        self.start_time = 0
-        self.timeInterval = 100
+        self.start_time = 0  # время начало ввода
+        self.timeInterval = 100  # интервал вызова
         self.entered_text.textChanged.connect(self.start_timer)
 
-    def showTime(self):
-        time_r = int(time.time() - self.start_time)
+    def showTime(self):  # функция показа значения секундомера
+        time_r = int(time.time() - self.start_time)  # разница между началом и текущем временем
+        # перевод времени в минуту и секунду
         minutes = time_r // 60
         seconds = time_r % 60
-        if minutes > 99:
+        if minutes > 99:  # если минут больше чем 99, то вывод максимального времени
             self.timer_label.setText('99:99')
         else:
+            # создание строки для удобного показа времени
             minutes = str(minutes)
             seconds = str(seconds)
             stopwatch = '0' * (2 - len(minutes)) + minutes + ':' + '0' * (2 - len(seconds)) + seconds
@@ -50,8 +56,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.timer.start(self.timeInterval)
 
     def load_users(self):  # загрузка пользователей из базы данных в словарь
-        con = sqlite3.connect("data/trainer_db.db")
-        cur = con.cursor()
+        cur = self.con.cursor()
         users = cur.execute("""SELECT user_id, nickname FROM Users""").fetchall()
         for user in users:
             self.users_id[user[1]] = user[0]
@@ -62,7 +67,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             con.commit()
         con.close()
 
-    def set_func(self):  # функция для привязки интерфейса к функциям
+    def interface_binding(self):  # функция для привязки интерфейса к функциям
         # настройки темы
         self.dark_theme.triggered.connect(lambda: self.change_theme("dark"))
         self.light_theme.triggered.connect(lambda: self.change_theme("light"))

@@ -1,24 +1,27 @@
 import sqlite3
 import sys
 import time
+from random import choice
 from project import Ui_MainWindow
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 
+# Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом
 class MyWidget(QMainWindow, Ui_MainWindow):
     def __init__(self):
-        super(MyWidget, self).__init__(QMainWindow, Ui_MainWindow)
+        super().__init__()
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         # остальное без изменений
         self.setupUi(self)
 
         # связываемся с базой данных trainer_db.db
-        self.con = sqlite3.connect("data/trainer_db.db")
+        self.con = sqlite3.connect("data\\trainer_db.db")
 
-        self.difficulty_mode = 1  # легкий режим по умолчанию
+        self.difficulty_mode = 'easy'  # легкий режим по умолчанию
         self.users_id = {}
         self.load_users()
         self.user = "Гость"  # пользователь по умолчанию
@@ -33,15 +36,21 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.timer.timeout.connect(self.showTime)
         self.start_time = 0  # время начало ввода
         self.timeInterval = 100  # интервал вызова
-        self.entered_text.textChanged.connect(self.start_timer)
+
+        # привязка и загрузка текстов
+        self.entered_text.textChanged.connect(self.compare_texts)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.load_text(self.difficulty_mode)
 
     def showTime(self):  # функция показа значения секундомера
         time_r = int(time.time() - self.start_time)  # разница между началом и текущем временем
         # перевод времени в минуту и секунду
         minutes = time_r // 60
         seconds = time_r % 60
-        if minutes > 99:  # если минут больше чем 99, то вывод максимального времени
-            self.timer_label.setText('99:99')
+        if minutes > 59:  # если минут больше чем 59, то вывод максимального времени
+            self.timer_label.setText('59:59')
         else:
             # создание строки для удобного показа времени
             minutes = str(minutes)
@@ -49,11 +58,17 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             stopwatch = '0' * (2 - len(minutes)) + minutes + ':' + '0' * (2 - len(seconds)) + seconds
             self.timer_label.setText(stopwatch)
 
-    def start_timer(self):
+    def compare_texts(self):
         if not self.is_start:
             self.is_start = True
-            self.start_time = time.time()
-            self.timer.start(self.timeInterval)
+            self.start_timer()
+        else:
+            pass
+
+    def start_timer(self):
+        self.start_time = time.time()
+        self.timer_label.setText('00:00')
+        self.timer.start(self.timeInterval)
 
     def load_users(self):  # загрузка пользователей из базы данных в словарь
         cur = self.con.cursor()
@@ -64,8 +79,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         if len(users) == 0:
             cur.execute("INSERT INTO Users(nickname) VALUES('Гость')")
             self.users_id["Гость"] = 1
-            con.commit()
-        con.close()
+            self.con.commit()
 
     def interface_binding(self):  # функция для привязки интерфейса к функциям
         # настройки темы
@@ -73,10 +87,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.light_theme.triggered.connect(lambda: self.change_theme("light"))
 
         # настройки сложности
-        self.easy_mode.triggered.connect(lambda: self.change_difficulty(1))
-        self.normal_mode.triggered.connect(lambda: self.change_difficulty(2))
-        self.hard_mode.triggered.connect(lambda: self.change_difficulty(3))
-        self.insane_mode.triggered.connect(lambda: self.change_difficulty(4))
+        self.easy_mode.triggered.connect(lambda: self.change_difficulty('easy'))
+        self.normal_mode.triggered.connect(lambda: self.change_difficulty('normal'))
+        self.hard_mode.triggered.connect(lambda: self.change_difficulty('hard'))
+        self.insane_mode.triggered.connect(lambda: self.change_difficulty('insane'))
 
         # настройки пользователя
         self.register_user.triggered.connect(self.registration)
@@ -100,10 +114,26 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.menubar.setStyleSheet("color: white;")
 
     def change_difficulty(self, diff):
+        if self.difficulty_mode != diff:
+            self.load_text(difficult)
         self.difficulty_mode = diff
 
+    def load_text(self, difficult):
+        cur = self.con.cursor()
+        texts = cur.execute(f"""
+        SELECT text FROM Texts 
+            WHERE difficulty_id=(
+        SELECT difficulty_id FROM Difficults 
+            WHERE mode = '{difficult}')
+        """).fetchall()
+        text = choice(texts)[0]
+        while self.generated_text.text() == text:
+            text = choice(texts)[0]
+        self.generated_text.setText(text)
+        self.entered_text.setText("")
+
     def registration(self):
-        username, ok_pressed = QInputDialog.getText(self, "Регистрация", "Введите имя пользователя: ")
+        username, ok_pressed = QInputDialog.getText(self, "Регистрация", "Введите имя пользователя:")
         if ok_pressed:
             if username in self.users_id:
                 error_message = QMessageBox(self)
@@ -115,15 +145,16 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 return
 
             self.user = username
-            con = sqlite3.connect("data/trainer_db.db")
-            cur = con.cursor()
+            cur = self.con.cursor()
             cur.execute(f"INSERT INTO Users(nickname) VALUES('{username}')")
-            con.commit()
+            self.con.commit()
             self.users_id[username] = int(cur.execute(f"""
             SELECT user_id FROM Users
                 WHERE nickname = '{username}'""").fetchall()[0][0])
             print(self.users_id)
-            con.close()
+
+    def closeEvent(self, *args, **kwargs):
+        self.con.close()
 
 
 if __name__ == '__main__':

@@ -8,6 +8,13 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
+from PyQt5 import QtCore, QtWidgets
+
+if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+
+if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 
 
 # Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом
@@ -115,7 +122,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     def change_difficulty(self, diff):
         if self.difficulty_mode != diff:
-            self.load_text(difficult)
+            self.load_text(diff)
         self.difficulty_mode = diff
 
     def load_text(self, difficult):

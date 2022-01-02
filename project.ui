@@ -108,7 +108,7 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </widget>
-   <widget class="QLabel" name="timer_label">
+   <widget class="QLabel" name="stopwatch_label">
     <property name="geometry">
      <rect>
       <x>680</x>

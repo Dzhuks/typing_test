@@ -3,16 +3,17 @@ import sqlite3
 import sys
 import time
 import csv
-from random import choice
+from random import choice, randint
 from project import Ui_MainWindow
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QDialog
 from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QTextCursor
-
+from PyQt5.QtGui import QPixmap
+from res_dialog import Ui_Dialog
 
 # константы
 DATABASE = "data\\trainer_db.db"
@@ -76,7 +77,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.theme = "dark"  # тема по умолчанию
         self.interface_binding()  # привязка частей интерфейса к функциям
 
-        self.is_programm_change = False  # переменная для отслеживания изменения программой текста
+        self.is_program_change = False  # переменная для отслеживания изменения программой текста
         self.is_stopwatch_start = False  # переменная для отслеживания начало старта секундомера
 
         # Создание секундомера
@@ -95,10 +96,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # начать заново ввод текста
     def start_again(self):
-        self.is_programm_change = True  # программа изменила текст
+        self.is_program_change = True  # программа изменила текст
         self.reset_stopwatch()  # перезапустить секундомер
         self.entered_text.setText("")  # обнулить вводимый текст
-        self.is_programm_change = False  # вернуться к исходному значению
+        self.is_program_change = False  # вернуться к исходному значению
 
     # загрузка нового текста со сложностью difficult из таблицы Texts
     def load_text(self, difficult):
@@ -124,7 +125,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # обработчик события изменения текста
     def text_changed(self):
-        if not self.is_programm_change:
+        if not self.is_program_change:
             if not self.is_stopwatch_start:  # если таймер был не запущен, запустить его
                 self.start_stopwatch()
             self.compare_texts()
@@ -146,9 +147,9 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 is_correct = False
             color = green if is_correct else red
             html += f"<font color='{color}' size = {4} >{character}</font>"
-        self.is_programm_change = True
+        self.is_program_change = True
         self.entered_text.setHtml(html)
-        self.is_programm_change = False
+        self.is_program_change = False
         self.entered_text.setTextCursor(cursor)
         if is_correct and len(entered_text) == len(generated_text):
             self.show_result()
@@ -289,10 +290,37 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 WHERE nickname = '{username}'""").fetchall()[0][0])
             print(self.users_id)
 
+    # функция для входа в пользователя
+    def login(self):
+        # получение ника для входа
+        username, ok_pressed = QInputDialog.getItem(self, "Вход", "Выберите пользователя: ",
+                                                    self.users_id.keys(), 1, False)
+        # если пользователь нажал на ОК, то сменить пользователя
+        if ok_pressed:
+            self.user = username  # смена пользователя
+
     # функция, которая вызывается, когда закрывается окно
     def closeEvent(self, *args, **kwargs):
         # Закрытие соединение с базой данных при закрытие окна
         self.con.close()
+
+
+class ResultsDialog(QDialog, Ui_Dialog):
+    def __init__(self):
+        super().__init__(self)  # конструктор родительского класса
+        # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
+        self.setupUi(self)
+        self.button_box.accepted.connect(self.accept_data)  # привязка функции кнопки ОК
+
+        # self.time_label.setText(f"Общее время: {time}")
+        # self.cpm_label.setText(f"Символов в минуту: {result}")
+        num = randint(1, 5)  # получение рандомного номера картинки
+        pixmap = QPixmap(f"data\\image_{num}")  # получение картинки из data
+        self.image_label.setPixmap(pixmap)  # вставка картинки в label
+
+    # функция для закрытия окна на нажатие ОК
+    def accept_data(self):
+        self.close()
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@
 import sqlite3
 import sys
 import time
+import csv
 from random import choice
 from project import Ui_MainWindow
 from PyQt5.QtWidgets import QApplication
@@ -12,12 +13,49 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QTextCursor
 
-# адаптация к экранам с высоким разрешением (HiRes)
-if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
-    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 
-if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
-    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+# константы
+DATABASE = "data\\trainer_db.db"
+
+
+# конвертирование sql запроса в csv файл
+def convert_sql_to_csv(name, request):  # в функцию передаем имя файла и сам запрос
+    # связываемся с базой данных trainer_db.db
+    con = sqlite3.connect(DATABASE)
+
+    # Создание курсора
+    cur = con.cursor()
+
+    # Выполнение запроса и получение всех результатов
+    data = cur.execute(request).fetchall()
+
+    # ключи csv файла
+    titles = [description[0] for description in cur.description]
+
+    with open(name, 'w+', newline='') as csv_file:  # открываем файл, если он есть, а иначе создаем его
+        writer = csv.DictWriter(
+            csv_file, fieldnames=titles,
+            delimiter=';', quoting=csv.QUOTE_NONNUMERIC)  # объект для записи (writer)
+        writer.writeheader()  # пишем заголовок titles
+        # запись в csv файл
+        for d in data:
+            writer.writerow({titles[i]: d[i] for i in range(len(titles))})
+
+
+# конвертирование sql запроса в csv файл
+def convert_sql_to_txt(name, request):  # в функцию передаем имя файла и сам запрос
+    # связываемся с базой данных trainer_db.db
+    con = sqlite3.connect(DATABASE)
+
+    # Создание курсора
+    cur = con.cursor()
+
+    # Выполнение запроса и получение всех результатов
+    data = cur.execute(request).fetchall()
+
+    with open(name, 'w+') as txt_file:  # открываем файл, если он есть, а иначе создаем его
+        for elem in data:
+            txt_file.write(elem[0])
 
 
 # Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом
@@ -28,7 +66,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         # связываемся с базой данных trainer_db.db
-        self.con = sqlite3.connect("data\\trainer_db.db")
+        self.con = sqlite3.connect(DATABASE)
 
         self.difficulty_mode = 'easy'  # легкий режим по умолчанию
         self.users_id = {}
@@ -38,7 +76,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.theme = "dark"  # тема по умолчанию
         self.interface_binding()  # привязка частей интерфейса к функциям
 
-        self.is_programme_change = False  # переменная для отслеживания изменения программой текста
+        self.is_programm_change = False  # переменная для отслеживания изменения программой текста
         self.is_stopwatch_start = False  # переменная для отслеживания начало старта секундомера
 
         # Создание секундомера
@@ -57,10 +95,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # начать заново ввод текста
     def start_again(self):
-        self.is_programme_change = True  # программа изменила текст
+        self.is_programm_change = True  # программа изменила текст
         self.reset_stopwatch()  # перезапустить секундомер
         self.entered_text.setText("")  # обнулить вводимый текст
-        self.is_programme_change = False  # вернуться к исходному значению
+        self.is_programm_change = False  # вернуться к исходному значению
 
     # загрузка нового текста со сложностью difficult из таблицы Texts
     def load_text(self, difficult):
@@ -86,7 +124,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # обработчик события изменения текста
     def text_changed(self):
-        if not self.is_programme_change:
+        if not self.is_programm_change:
             if not self.is_stopwatch_start:  # если таймер был не запущен, запустить его
                 self.start_stopwatch()
             self.compare_texts()
@@ -108,9 +146,9 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 is_correct = False
             color = green if is_correct else red
             html += f"<font color='{color}' size = {4} >{character}</font>"
-        self.is_programme_change = True
+        self.is_programm_change = True
         self.entered_text.setHtml(html)
-        self.is_programme_change = False
+        self.is_programm_change = False
         self.entered_text.setTextCursor(cursor)
         if is_correct and len(entered_text) == len(generated_text):
             self.show_result()
@@ -258,6 +296,13 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
 
 if __name__ == '__main__':
+    # адаптация к экранам с высоким разрешением (HiRes)
+    if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
+        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+
+    if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
+        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+
     # Создание класса приложения PyQT
     app = QApplication(sys.argv)
     # создание экземпляра класса MyWidget

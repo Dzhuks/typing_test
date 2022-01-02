@@ -104,6 +104,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             if index <= len(generated_text) - 1:
                 if generated_text[index] != character:
                     is_correct = False
+            else:
+                is_correct = False
             color = green if is_correct else red
             html += f"<font color='{color}' size = {4} >{character}</font>"
         self.is_programme_change = True

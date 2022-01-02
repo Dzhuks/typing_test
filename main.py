@@ -10,8 +10,10 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtGui import QTextCursor
 from PyQt5.QtGui import QPixmap
 from res_dialog import Ui_Dialog
+
 # адаптация к экранам с высоким разрешением (HiRes)
 if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
@@ -53,7 +55,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     # обработчик событий нажатия клавиш и мыши
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:  # при нажатие на esc начать заново
-            pass
+            self.start_again()
 
     # начать заново ввод текста
     def start_again(self):
@@ -86,13 +88,37 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # обработчик события изменения текста
     def text_changed(self):
-        if not self.is_program_change:  # если изменения не сделаны программой, то начать сравнивать тексты
+        if not self.is_program_change:
             if not self.is_stopwatch_start:  # если таймер был не запущен, запустить его
                 self.start_stopwatch()
             self.compare_texts()
 
     # функция сравнения текстов из generated_text и entered_text
-    def compare_texts(self):  # функция заглушка
+    def compare_texts(self):
+        cursor = self.entered_text.textCursor()
+        generated_text = self.generated_text.text()
+        entered_text = self.entered_text.toPlainText()
+        is_correct = True
+        green = '#49DC01'
+        red = '#DC143C'
+        html = ""
+        for index, character in enumerate(entered_text):
+            if index <= len(generated_text) - 1:
+                if generated_text[index] != character:
+                    is_correct = False
+            else:
+                is_correct = False
+            color = green if is_correct else red
+            html += f"<font color='{color}' size = {4} >{character}</font>"
+        self.is_program_change = True
+        self.entered_text.setHtml(html)
+        self.is_program_change = False
+        self.entered_text.setTextCursor(cursor)
+        if is_correct and len(entered_text) == len(generated_text):
+            self.show_result()
+
+    # функция показа результата пользователя
+    def show_result(self):  # заглушка
         pass
 
     # запуск секундомера

@@ -92,7 +92,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.compare_texts()
 
     # функция сравнения текстов из generated_text и entered_text
-    def compare_texts(self):  # функция заглушка
+    def compare_texts(self):
         cursor = self.entered_text.textCursor()
         generated_text = self.generated_text.text()
         entered_text = self.entered_text.toPlainText()
@@ -110,6 +110,12 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.entered_text.setHtml(html)
         self.is_programme_change = False
         self.entered_text.setTextCursor(cursor)
+        if is_correct and len(entered_text) == len(generated_text):
+            self.show_result()
+
+    # функция показа результата пользователя
+    def show_result(self):  # заглушка
+        pass
 
     # запуск секундомера
     def start_stopwatch(self):

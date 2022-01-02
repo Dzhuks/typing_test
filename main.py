@@ -2,14 +2,16 @@
 import sqlite3
 import sys
 import time
-from random import choice
+from random import choice, randint
 from project import Ui_MainWindow
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QDialog
 from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtGui import QPixmap
+from res_dialog import Ui_Dialog
 # адаптация к экранам с высоким разрешением (HiRes)
 if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
@@ -51,7 +53,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     # обработчик событий нажатия клавиш и мыши
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:  # при нажатие на esc начать заново
-            self.start_again()
+            pass
 
     # начать заново ввод текста
     def start_again(self):
@@ -238,6 +240,24 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def closeEvent(self, *args, **kwargs):
         # Закрытие соединение с базой данных при закрытие окна
         self.con.close()
+
+
+class ResultsDialog(QDialog, Ui_Dialog):
+    def __init__(self):
+        super().__init__(self)  # конструктор родительского класса
+        # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
+        self.setupUi(self)
+        self.button_box.accepted.connect(self.accept_data)  # привязка функции кнопки ОК
+
+        # self.time_label.setText(f"Общее время: {time}")
+        # self.cpm_label.setText(f"Символов в минуту: {result}")
+        num = randint(1, 5)  # получение рандомного номера картинки
+        pixmap = QPixmap(f"data\\image_{num}")  # получение картинки из data
+        self.image_label.setPixmap(pixmap)  # вставка картинки в label
+
+    # функция для закрытия окна на нажатие ОК
+    def accept_data(self):
+        self.close()
 
 
 if __name__ == '__main__':

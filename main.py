@@ -19,6 +19,10 @@ from res_dialog import Ui_Dialog
 DATABASE = "data\\trainer_db.db"
 
 
+def to_fixed(num, digits=0):
+    return f"{numObj:.{digits}f}"
+
+
 # конвертирование sql запроса в csv файл
 def convert_sql_to_csv(name, request):  # в функцию передаем имя файла и сам запрос
     # связываемся с базой данных trainer_db.db
@@ -156,7 +160,11 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # функция показа результата пользователя
     def show_result(self):  # заглушка
-        pass
+        self.stop_stopwatch()
+        t = time.time() - self.start_time
+        dialog = ResultsDialog(self.stopwatch_label.text(), len(self.generated_text.text()) / t)
+        dialog.show()
+        dialog.exec()
 
     # запуск секундомера
     def start_stopwatch(self):
@@ -170,6 +178,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.is_stopwatch_start = False
         self.start_time = 0  # в качестве начального времени установить 0
         self.stopwatch_label.setText('00:00')
+        self.stopwatch.stop()  # остановка секундомера
+
+    # остановка таймера
+    def stop_stopwatch(self):
         self.stopwatch.stop()  # остановка секундомера
 
     # функция показа значения секундомера
@@ -306,17 +318,17 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
 
 class ResultsDialog(QDialog, Ui_Dialog):
-    def __init__(self):
-        super().__init__(self)  # конструктор родительского класса
+    def __init__(self, time, result):
+        super().__init__()  # конструктор родительского класса
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         self.setupUi(self)
         self.button_box.accepted.connect(self.accept_data)  # привязка функции кнопки ОК
 
-        # self.time_label.setText(f"Общее время: {time}")
-        # self.cpm_label.setText(f"Символов в минуту: {result}")
-        num = randint(1, 5)  # получение рандомного номера картинки
-        pixmap = QPixmap(f"data\\image_{num}")  # получение картинки из data
-        self.image_label.setPixmap(pixmap)  # вставка картинки в label
+        self.time_label.setText(f"Общее время: {time}")
+        self.cpm_label.setText(f"Символов в минуту: {result:.{1}f}")
+        # num = randint(1, 5)  # получение рандомного номера картинки
+        # pixmap = QPixmap(f"data\\image_{num}")  # получение картинки из data
+        # self.image_label.setPixmap(pixmap)  # вставка картинки в label
 
     # функция для закрытия окна на нажатие ОК
     def accept_data(self):

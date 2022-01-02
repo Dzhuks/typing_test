@@ -16,7 +16,7 @@
   <property name="styleSheet">
    <string notr="true">background-color: rgb(56, 56, 56);</string>
   </property>
-  <widget class="QTableWidget" name="tableWidget">
+  <widget class="QTableWidget" name="recordings_table">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -29,7 +29,7 @@
     <string notr="true">color: rgb(240, 223, 28);</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="username_labe">
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -56,7 +56,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="delete_btn">
    <property name="geometry">
     <rect>
      <x>350</x>

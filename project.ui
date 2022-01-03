@@ -132,7 +132,7 @@ p, li { white-space: pre-wrap; }
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="username_label">
     <property name="geometry">
      <rect>
       <x>30</x>

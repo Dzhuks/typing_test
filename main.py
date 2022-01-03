@@ -19,21 +19,8 @@ from res_dialog import Ui_Dialog
 DATABASE = "data\\trainer_db.db"
 
 
-def to_fixed(num, digits=0):
-    return f"{numObj:.{digits}f}"
-
-
 # конвертирование sql запроса в csv файл
-def convert_sql_to_csv(name, request):  # в функцию передаем имя файла и сам запрос
-    # связываемся с базой данных trainer_db.db
-    con = sqlite3.connect(DATABASE)
-
-    # Создание курсора
-    cur = con.cursor()
-
-    # Выполнение запроса и получение всех результатов
-    data = cur.execute(request).fetchall()
-
+def convert_sql_to_csv(name, data):  # в функцию передаем имя файла и данные
     # ключи csv файла
     titles = [description[0] for description in cur.description]
 
@@ -48,19 +35,14 @@ def convert_sql_to_csv(name, request):  # в функцию передаем и�
 
 
 # конвертирование sql запроса в csv файл
-def convert_sql_to_txt(name, request):  # в функцию передаем имя файла и сам запрос
-    # связываемся с базой данных trainer_db.db
-    con = sqlite3.connect(DATABASE)
-
-    # Создание курсора
-    cur = con.cursor()
-
+def convert_sql_to_txt(name, data):  # в функцию передаем имя файла и данные
     # Выполнение запроса и получение всех результатов
     data = cur.execute(request).fetchall()
 
     with open(name, 'w+') as txt_file:  # открываем файл, если он есть, а иначе создаем его
         for elem in data:
             txt_file.write(elem[0])
+            txt_file.write('\n')
 
 
 # Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом

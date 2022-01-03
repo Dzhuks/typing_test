@@ -144,7 +144,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def show_result(self):  # заглушка
         self.stop_stopwatch()
         t = time.time() - self.start_time
-        dialog = ResultsDialog(self.stopwatch_label.text(), len(self.generated_text.text()) / t)
+        dialog = ResultsDialog(self.stopwatch_label.text(), len(self.generated_text.text()) / t * 60)
         dialog.show()
         dialog.exec()
 

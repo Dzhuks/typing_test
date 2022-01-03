@@ -15,6 +15,14 @@ from PyQt5.QtGui import QTextCursor
 from PyQt5.QtGui import QPixmap
 from res_dialog import Ui_Dialog
 
+# адаптация к экранам с высоким разрешением (HiRes)
+if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+
+if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+
+
 # константы
 DATABASE = "data\\trainer_db.db"
 
@@ -36,8 +44,6 @@ def convert_sql_to_csv(name, data):  # в функцию передаем имя
 
 # конвертирование sql запроса в csv файл
 def convert_sql_to_txt(name, data):  # в функцию передаем имя файла и данные
-    # Выполнение запроса и получение всех результатов
-    data = cur.execute(request).fetchall()
 
     with open(name, 'w+') as txt_file:  # открываем файл, если он есть, а иначе создаем его
         for elem in data:
@@ -318,13 +324,6 @@ class ResultsDialog(QDialog, Ui_Dialog):
 
 
 if __name__ == '__main__':
-    # адаптация к экранам с высоким разрешением (HiRes)
-    if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
-        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
-
-    if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
-        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
-
     # Создание класса приложения PyQT
     app = QApplication(sys.argv)
     # создание экземпляра класса MyWidget

@@ -3,6 +3,7 @@ import sqlite3
 import sys
 import time
 import csv
+import datetime
 from random import choice, randint
 from project import Ui_MainWindow
 from PyQt5.QtWidgets import QApplication
@@ -25,6 +26,8 @@ if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
 
 # константы
 DATABASE = "data\\trainer_db.db"
+GREEN = '#49DC01'
+RED = '#DC143C'
 
 
 # конвертирование sql запроса в csv файл
@@ -77,7 +80,9 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.stopwatch.timeout.connect(self.show_stopwatch)
         self.start_time = 0  # время начало ввода
         self.timeInterval = 100  # интервал вызова секундомера
+        self.time_r = 0  # разница между начальным временем и текущем временем. Изначально равен 0
 
+        self.load_text(self.difficulty_mode)
         # при изменении текста в entered_text вызвать функцию text_changed
         self.entered_text.textChanged.connect(self.text_changed)
 
@@ -128,8 +133,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         generated_text = self.generated_text.text()
         entered_text = self.entered_text.toPlainText()
         is_correct = True
-        green = '#49DC01'
-        red = '#DC143C'
         html = ""
         for index, character in enumerate(entered_text):
             if index <= len(generated_text) - 1:
@@ -137,20 +140,62 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                     is_correct = False
             else:
                 is_correct = False
-            color = green if is_correct else red
+            color = GREEN if is_correct else RED
             html += f"<font color='{color}' size = {4} >{character}</font>"
         self.is_program_change = True
         self.entered_text.setHtml(html)
         self.is_program_change = False
         self.entered_text.setTextCursor(cursor)
         if is_correct and len(entered_text) == len(generated_text):
-            self.show_result()
+            self.show_and_load_recording()
+
+    def show_and_load_recording(self):
+        # Создание курсора
+        cur = self.con.cursor()
+
+        # Получение user_id путем запроса из таблицы Users
+        user_id = cur.execute(f"""
+            SELECT user_id FROM Users 
+                WHERE nickname='{self.user}'""").fetchall()[0][0]
+
+        # Получение текущей даты при помощи библиотеки datetime
+        data = datetime.datetime.now().date()
+
+        # Получение text_id путем запроса из таблицы Texts
+        text_id = cur.execute(f"""
+            SELECT text_id FROM Texts
+                WHERE text='{self.generated_text.text()}'""").fetchall()[0][0]
+
+        # Получение difficulty_id путем запроса из таблицы Texts
+        difficulty_id = cur.execute(f"""
+            SELECT difficulty_id FROM Difficults
+                WHERE mode='{self.difficulty_mode}'""").fetchall()[0][0]
+
+        # Получение time через self.stopwatch_label.text()
+        time = self.stopwatch_label.text()
+
+        # typing_speed = S / time * 60 сим/мин
+        typing_speed = len(self.generated_text.text()) / self.time_r * 60
+
+        # добавляем запись в бд и показываем результат пользователю
+        self.load_recording(user_id, data, text_id, difficulty_id, time, typing_speed)
+        self.show_result(time, typing_speed)
+
+    def load_recording(self, user_id, data, text_id, difficulty_id, time, typing_speed):
+        # Создание курсора
+        cur = self.con.cursor()
+
+        que = f"""INSERT INTO Recordings(user_id, data, text_id, difficulty_id, time, typing_speed) 
+        VALUES ({user_id}, {data}, {text_id}, {difficulty_id}, '{time}', {typing_speed})"""
+
+        cur.execute(que)
+
+        self.con.commit()
 
     # функция показа результата пользователя
-    def show_result(self):  # заглушка
-        self.stop_stopwatch()
-        t = time.time() - self.start_time
-        dialog = ResultsDialog(self.stopwatch_label.text(), len(self.generated_text.text()) / t * 60)
+    def show_result(self, time, typing_speed):
+        self.stopwatch.stop()  # остановка секундомера
+        dialog = ResultsDialog(time, typing_speed)
         dialog.show()
         dialog.exec()
 
@@ -158,6 +203,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def start_stopwatch(self):
         self.is_stopwatch_start = True
         self.start_time = time.time()  # в качестве начального времени установить текущее время
+        self.time_r = 0  # Обнулить разницу во времени
         self.stopwatch_label.setText('00:00')
         self.stopwatch.start(self.timeInterval)  # запуск секундомера с итервалом timeInterval
 
@@ -165,21 +211,18 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def reset_stopwatch(self):
         self.is_stopwatch_start = False
         self.start_time = 0  # в качестве начального времени установить 0
+        self.time_r = 0  # Обнулить разницу во времени
         self.stopwatch_label.setText('00:00')
-        self.stopwatch.stop()  # остановка секундомера
-
-    # остановка таймера
-    def stop_stopwatch(self):
         self.stopwatch.stop()  # остановка секундомера
 
     # функция показа значения секундомера
     def show_stopwatch(self):
-        # разница между начальным временем и текущем временем
-        time_r = int(time.time() - self.start_time)
+        # обновить разницу во времени
+        self.time_r = int(time.time() - self.start_time)
 
         # перевод времени в минуту и секунду
-        minutes = time_r // 60
-        seconds = time_r % 60
+        minutes = self.time_r // 60
+        seconds = self.time_r % 60
         if minutes > 59:  # если минут больше чем 59, то вывод максимального времени
             self.timer_label.setText('59:59')
         else:

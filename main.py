@@ -52,6 +52,7 @@ def convert_sql_to_txt(name, data):  # в функцию передаем имя
             txt_file.write('\n')
 
 
+# создание QTableWidgetItem с flags
 def create_item(text, flags):
     table_widget_item = QTableWidgetItem(text)
     table_widget_item.setFlags(flags)
@@ -59,51 +60,63 @@ def create_item(text, flags):
 
 
 class RecordingsWindow(QWidget, Ui_Form):
-    def __init__(self, user):
+    def __init__(self, user, theme):
         super().__init__()  # конструктор родительского класса
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         self.setupUi(self)
-        self.username_labe.setText(user)
-        self.load_table(user)
+
+        self.change_theme(theme)  # устанавливаем тему
+        self.username_labe.setText(user)  # устанавливаем пользователя
+        self.load_table(user)  # заргужаем таблицу
 
     def load_table(self, user):
+        # столбцы таблицы
+        columns = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
 
-        keys = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
-
+        # связываемся с базой данных
         con = sqlite3.connect(DATABASE)
 
         # Создание курсора
         cur = con.cursor()
 
+        # получаем данные из бд путем запроса
         result = cur.execute(f"""
-        SELECT {', '.join(keys)} FROM Recordings
+        SELECT {', '.join(columns)} FROM Recordings
             WHERE user_id=(
         SELECT user_id FROM Users WHERE nickname='{user}')
         """).fetchall()
 
-        self.recordings_table.setColumnCount(len(keys))
-        self.recordings_table.setHorizontalHeaderLabels(keys)
+        # устанавливаем имена столбцов и количество рядов, столбцов
+        self.recordings_table.setColumnCount(len(columns))
+        self.recordings_table.setHorizontalHeaderLabels(columns)
         self.recordings_table.setRowCount(len(result))
 
+        # перебираем элементы
         for i, row in enumerate(result):
             for j, col in enumerate(row):
-                if keys[j] == 'user_id':
+                # подменяем элемент с id на его значение
+                if columns[j] == 'user_id':
                     col = user
-                elif keys[j] == 'text_id':
+                elif columns[j] == 'text_id':
                     que = f"""
                     SELECT text FROM Texts
                         WHERE text_id={col}"""
 
                     col = cur.execute(que).fetchall()[0][0]
 
-                elif keys[j] == 'difficult_id':
+                elif columns[j] == 'difficult_id':
                     que = f"""
                     SELECT mode FROM Difficults
                         WHERE difficulty_id={col}"""
 
                     col = cur.execute(que).fetchall()[0][0]
 
+                # загружаем элемент и делаем его неприкосновенным
                 self.recordings_table.setItem(i, j, create_item(str(col), Qt.ItemIsEnabled))
+
+    # функция смены темы
+    def change_theme(self, theme):
+        pass
 
 
 # Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом

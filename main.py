@@ -6,15 +6,13 @@ import csv
 import datetime
 from random import choice, randint
 from project import Ui_MainWindow
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QMainWindow, QDialog
-from PyQt5.QtCore import QTimer
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QInputDialog, QMessageBox
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtGui import QPixmap
 from res_dialog import Ui_Dialog
+from recordings_window import Ui_Form
+from PyQt5.QtWidgets import QDialog, QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
+from PyQt5.QtCore import QTimer, Qt
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtGui import QTextCursor, QPixmap
 
 # адаптация к экранам с высоким разрешением (HiRes)
 if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
@@ -52,6 +50,19 @@ def convert_sql_to_txt(name, data):  # в функцию передаем имя
         for elem in data:
             txt_file.write(elem[0])
             txt_file.write('\n')
+
+
+def create_item(text, flags):
+    table_widget_item = QTableWidgetItem(text)
+    table_widget_item.setFlags(flags)
+    return table_widget_item
+
+
+class RecordingsWindow(QWidget, Ui_Form):
+    def __init__(self, user):
+        super().__init__()  # конструктор родительского класса
+        # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
+        self.setupUi(self)
 
 
 # Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом

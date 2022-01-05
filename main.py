@@ -26,11 +26,11 @@ if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
 
 # константы
 DATABASE = "data\\trainer_db.db"
-GRAY1 = "rgb(56, 56, 56)"
-GRAY2 = "rgb(122, 122, 122)"
-GREEN = "rgb(73, 220, 0)"
-YELLOW = "rgb(240, 223, 28)"
-BLUE = "rgb(14, 70, 255)"
+GRAY1 = "#383838"
+GRAY2 = "#7a7a7a"
+GREEN = "#49dc00"
+YELLOW = "#f0df1c"
+BLUE = "#0e46ff"
 
 
 # конвертирование sql запроса в csv файл

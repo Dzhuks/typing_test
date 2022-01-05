@@ -14,7 +14,6 @@ import csv
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtGui import QPixmap
 from res_dialog import Ui_Dialog
-from recordings_window import Ui_Form
 
 
 # адаптация к экранам с высоким разрешением (HiRes)
@@ -169,7 +168,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.show_result()
 
     # функция показа результата пользователя
-    def show_result(self):  # заглушка
+    def show_result(self):
         dialog = ResultsDialog()
         dialog.show()
         dialog.exec()
@@ -235,9 +234,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
         # настройки пользователя
         self.register_user.triggered.connect(self.registration)
-
-        # фукнция меню результатов
-        self.results_menu.triggered.connect()
 
     # функция установки светлой темы
     def set_light_theme(self):

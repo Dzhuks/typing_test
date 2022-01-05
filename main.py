@@ -5,14 +5,17 @@ import time
 from random import choice, randint
 from project import Ui_MainWindow
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QMainWindow, QDialog
+from PyQt5.QtWidgets import QMainWindow, QDialog, QWidget
 from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from PyQt5 import QtCore, QtWidgets
+import csv
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtGui import QPixmap
 from res_dialog import Ui_Dialog
+from recordings_window import Ui_Form
+
 
 # адаптация к экранам с высоким разрешением (HiRes)
 if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
@@ -20,6 +23,55 @@ if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
 
 if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+
+
+# константы
+DATABASE = "data\\trainer_db.db"
+GRAY1 = "rgb(56, 56, 56)"
+GRAY2 = "rgb(122, 122, 122)"
+GREEN = "rgb(73, 220, 0)"
+YELLOW = "rgb(240, 223, 28)"
+BLUE = "rgb(14, 70, 255)"
+
+
+# конвертирование sql запроса в csv файл
+def convert_sql_to_csv(name, request):  # в функцию передаем имя файла и сам запрос
+    # связываемся с базой данных trainer_db.db
+    con = sqlite3.connect(DATABASE)
+
+    # Создание курсора
+    cur = con.cursor()
+
+    # Выполнение запроса и получение всех результатов
+    data = cur.execute(request).fetchall()
+
+    # ключи csv файла
+    titles = [description[0] for description in cur.description]
+
+    with open(name, 'w+', newline='') as csv_file:  # открываем файл, если он есть, а иначе создаем его
+        writer = csv.DictWriter(
+            csv_file, fieldnames=titles,
+            delimiter=';', quoting=csv.QUOTE_NONNUMERIC)  # объект для записи (writer)
+        writer.writeheader()  # пишем заголовок titles
+        # запись в csv файл
+        for d in data:
+            writer.writerow({titles[i]: d[i] for i in range(len(titles))})
+
+
+# конвертирование sql запроса в csv файл
+def convert_sql_to_txt(name, request):  # в функцию передаем имя файла и сам запрос
+    # связываемся с базой данных trainer_db.db
+    con = sqlite3.connect(DATABASE)
+
+    # Создание курсора
+    cur = con.cursor()
+
+    # Выполнение запроса и получение всех результатов
+    data = cur.execute(request).fetchall()
+
+    with open(name, 'w+') as txt_file:  # открываем файл, если он есть, а иначе создаем его
+        for elem in data:
+            txt_file.write(elem[0])
 
 
 # Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом
@@ -30,10 +82,9 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         # связываемся с базой данных trainer_db.db
-        self.con = sqlite3.connect("data\\trainer_db.db")
+        self.con = sqlite3.connect(DATABASE)
 
         self.difficulty_mode = 'easy'  # легкий режим по умолчанию
-        self.users_id = {}
         self.load_users()
         self.user = "Гость"  # пользователь по умолчанию
 
@@ -119,7 +170,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # функция показа результата пользователя
     def show_result(self):  # заглушка
-        pass
+        dialog = ResultsDialog()
+        dialog.show()
+        dialog.exec()
+        self.start_again()
 
     # запуск секундомера
     def start_stopwatch(self):
@@ -164,21 +218,14 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         if len(users) == 0:
             # добавление в таблицу Users Гостя
             cur.execute("INSERT INTO Users(nickname) VALUES('Гость')")
-            # присваение Гостю id 1
-            self.users_id["Гость"] = 1
             # зафиксировать изменения в БД
             self.con.commit()
-        else:
-            # установка к каждому пользователю свой id
-            for user in users:
-                self.users_id[user[1]] = user[0]
-                print(user)
 
     # функция для привязки частей интерфейса к функциям
     def interface_binding(self):
         # настройки темы
-        self.dark_theme.triggered.connect(lambda: self.change_theme("dark"))
-        self.light_theme.triggered.connect(lambda: self.change_theme("light"))
+        self.dark_theme.triggered.connect(self.set_dark_theme)
+        self.light_theme.triggered.connect(self.set_light_theme)
 
         # настройки сложности
         self.easy_mode.triggered.connect(lambda: self.change_difficulty('easy'))
@@ -189,25 +236,33 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         # настройки пользователя
         self.register_user.triggered.connect(self.registration)
 
-    # функция изменения темы
-    def change_theme(self, theme):
-        if theme == "light" and theme != self.theme:
-            # установка светлой темы
+        # фукнция меню результатов
+        self.results_menu.triggered.connect()
+
+    # функция установки светлой темы
+    def set_light_theme(self):
+        # если светлая тема еще не установлена
+        if self.theme != "light":
             self.theme = "light"
             self.setStyleSheet("color: black")
-            self.generated_text.setStyleSheet("color: rgb(14, 70, 255);")
-            self.entered_text.setStyleSheet("color: rgb(73, 220, 0);")
-            self.hint_label.setStyleSheet("color: rgb(122, 122, 122);")
-            self.stopwatch_label.setStyleSheet("color: rgb(14, 70, 255);")
+            self.generated_text.setStyleSheet(f"color: {BLUE};")
+            self.entered_text.setStyleSheet(f"color: {GREEN};")
+            self.hint_label.setStyleSheet(f"color: {GRAY2};")
+            self.stopwatch_label.setStyleSheet(f"color: {BLUE};")
+            self.username_label.setStyleSheet(f"color: {BLUE}")
             self.menubar.setStyleSheet("color: black;")
-        elif theme == "dark" and theme != self.theme:
-            # установка темной темы
+
+    # функция установки темной темы
+    def set_dark_theme(self):
+        # если темная тема еще не установлена
+        if self.theme != "dark":
             self.theme = "dark"
-            self.setStyleSheet("background-color: rgb(56, 56, 56); color: white;")
-            self.generated_text.setStyleSheet("color: rgb(240, 223, 28);")
-            self.entered_text.setStyleSheet("color: rgb(73, 220, 0);")
-            self.hint_label.setStyleSheet("color: rgb(161, 161, 161);")
-            self.stopwatch_label.setStyleSheet("color: rgb(240, 223, 28);")
+            self.setStyleSheet(f"background-color: {GRAY1}; color: white;")
+            self.generated_text.setStyleSheet(f"color: {YELLOW};")
+            self.entered_text.setStyleSheet(f"color: {GREEN};")
+            self.hint_label.setStyleSheet(f"color: {GRAY2};")
+            self.stopwatch_label.setStyleSheet(f"color: {YELLOW};")
+            self.username_label.setStyleSheet(f"color: {YELLOW  }")
             self.menubar.setStyleSheet("color: white;")
 
     # функция изменения сложности
@@ -226,6 +281,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         # если пользователь нажал на ОК, то добавить его в таблицу Users в БД
         if ok_pressed:
             # если пользователь уже существует, то вызвать окно с ошибкой
+            cur = self.con.cursor()
+            cur.execute("""SELECT nickname FROM Users""")
             if username in self.users_id:
                 error_message = QMessageBox(self)
                 error_message.setIcon(QMessageBox.Critical)
@@ -269,17 +326,17 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
 
 class ResultsDialog(QDialog, Ui_Dialog):
-    def __init__(self):
-        super().__init__(self)  # конструктор родительского класса
+    def __init__(self, time, result):
+        QDialog.__init__(self)  # конструктор родительского класса
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         self.setupUi(self)
         self.button_box.accepted.connect(self.accept_data)  # привязка функции кнопки ОК
 
-        # self.time_label.setText(f"Общее время: {time}")
-        # self.cpm_label.setText(f"Символов в минуту: {result}")
-        num = randint(1, 5)  # получение рандомного номера картинки
-        pixmap = QPixmap(f"data\\image_{num}")  # получение картинки из data
-        self.image_label.setPixmap(pixmap)  # вставка картинки в label
+        self.time_label.setText(f"Общее время: {time}")
+        self.cpm_label.setText(f"Символов в минуту: {result}")
+        # num = randint(1, 5)  # получение рандомного номера картинки
+        # pixmap = QPixmap(f"data\\image_{num}")  # получение картинки из data
+        # self.image_label.setPixmap(pixmap)  # вставка картинки в label
 
     # функция для закрытия окна на нажатие ОК
     def accept_data(self):

@@ -112,6 +112,8 @@ class Ui_MainWindow(object):
         self.register_user.setObjectName("register_user")
         self.login_user = QtWidgets.QAction(MainWindow)
         self.login_user.setObjectName("login_user")
+        self.results_menu = QtWidgets.QAction(MainWindow)
+        self.results_menu.setObjectName("results_menu")
         self.theme_setting.addAction(self.dark_theme)
         self.theme_setting.addAction(self.light_theme)
         self.difficulty_setting.addAction(self.easy_mode)
@@ -123,6 +125,7 @@ class Ui_MainWindow(object):
         self.settings_menu.addAction(self.theme_setting.menuAction())
         self.settings_menu.addAction(self.difficulty_setting.menuAction())
         self.settings_menu.addAction(self.user_setting.menuAction())
+        self.settings_menu.addAction(self.results_menu)
         self.menubar.addAction(self.settings_menu.menuAction())
         self.menubar.addAction(self.about_menu.menuAction())
 
@@ -154,3 +157,4 @@ class Ui_MainWindow(object):
         self.insane_mode.setText(_translate("MainWindow", "Безумная (в планах)"))
         self.register_user.setText(_translate("MainWindow", "Регистрация"))
         self.login_user.setText(_translate("MainWindow", "Войти"))
+        self.results_menu.setText(_translate("MainWindow", "Результаты"))

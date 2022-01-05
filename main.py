@@ -9,7 +9,7 @@ from project import Ui_MainWindow
 from res_dialog import Ui_Dialog
 from recordings_window import Ui_Form
 from PyQt5.QtWidgets import QDialog, QInputDialog, QMessageBox
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QTableWidgetItem
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QTextCursor, QPixmap
@@ -63,6 +63,47 @@ class RecordingsWindow(QWidget, Ui_Form):
         super().__init__()  # конструктор родительского класса
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         self.setupUi(self)
+        self.username_labe.setText(user)
+        self.load_table(user)
+
+    def load_table(self, user):
+
+        keys = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
+
+        con = sqlite3.connect(DATABASE)
+
+        # Создание курсора
+        cur = con.cursor()
+
+        result = cur.execute(f"""
+        SELECT {', '.join(keys)} FROM Recordings
+            WHERE user_id=(
+        SELECT user_id FROM Users WHERE nickname='{user}')
+        """).fetchall()
+
+        self.recordings_table.setColumnCount(len(keys))
+        self.recordings_table.setHorizontalHeaderLabels(keys)
+        self.recordings_table.setRowCount(len(result))
+
+        for i, row in enumerate(result):
+            for j, col in enumerate(row):
+                if keys[j] == 'user_id':
+                    col = user
+                elif keys[j] == 'text_id':
+                    que = f"""
+                    SELECT text FROM Texts
+                        WHERE text_id={col}"""
+
+                    col = cur.execute(que).fetchall()[0][0]
+
+                elif keys[j] == 'difficult_id':
+                    que = f"""
+                    SELECT mode FROM Difficults
+                        WHERE difficulty_id={col}"""
+
+                    col = cur.execute(que).fetchall()[0][0]
+
+                self.recordings_table.setItem(i, j, create_item(str(col), Qt.ItemIsEnabled))
 
 
 # Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом
@@ -384,5 +425,9 @@ if __name__ == '__main__':
     ex = MyWidget()
     # показ экземпляра
     ex.show()
+
+    recordings_window = RecordingsWindow('Гость')
+
+    recordings_window.show()
     # при завершение исполнения QApplication завершить программу
     sys.exit(app.exec())

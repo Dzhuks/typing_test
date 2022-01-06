@@ -65,7 +65,7 @@ def convert_sql_to_txt(name, que):  # в функцию передаем имя 
 
     with open(name, 'w+') as txt_file:  # открываем файл, если он есть, а иначе создаем его
         for elem in data:
-            txt_file.write(elem[0])
+            txt_file.write(' '.join(elem))
             txt_file.write('\n')
 
 
@@ -456,9 +456,5 @@ if __name__ == '__main__':
     ex = MyWidget()
     # показ экземпляра
     ex.show()
-
-    recordings_window = RecordingsWindow('Гость', 'light')
-
-    recordings_window.show()
     # при завершение исполнения QApplication завершить программу
     sys.exit(app.exec())

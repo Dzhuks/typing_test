@@ -29,7 +29,16 @@ RED = '#DC143C'
 
 
 # конвертирование sql запроса в csv файл
-def convert_sql_to_csv(name, data):  # в функцию передаем имя файла и данные
+def convert_sql_to_csv(name, que):  # в функцию передаем имя файла и запрос
+    # связываемся с базой данных
+    con = sqlite3.connect(DATABASE)
+
+    # Создание курсора
+    cur = con.cursor()
+
+    # получаем данные из бд путем запроса
+    data = cur.execute(que).fetchall()
+
     # ключи csv файла
     titles = [description[0] for description in cur.description]
 
@@ -44,7 +53,15 @@ def convert_sql_to_csv(name, data):  # в функцию передаем имя
 
 
 # конвертирование sql запроса в csv файл
-def convert_sql_to_txt(name, data):  # в функцию передаем имя файла и данные
+def convert_sql_to_txt(name, que):  # в функцию передаем имя файла и запрос
+    # связываемся с базой данных
+    con = sqlite3.connect(DATABASE)
+
+    # Создание курсора
+    cur = con.cursor()
+
+    # получаем данные из бд путем запроса
+    data = cur.execute(que).fetchall()
 
     with open(name, 'w+') as txt_file:  # открываем файл, если он есть, а иначе создаем его
         for elem in data:
@@ -71,6 +88,7 @@ class RecordingsWindow(QWidget, Ui_Form):
 
     def load_table(self, user):
         # столбцы таблицы
+        keys = ['record_id', 'user', 'data', 'text', 'difficulty', 'time', 'typing_speed']
         columns = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
 
         # связываемся с базой данных
@@ -87,8 +105,8 @@ class RecordingsWindow(QWidget, Ui_Form):
         """).fetchall()
 
         # устанавливаем имена столбцов и количество рядов, столбцов
-        self.recordings_table.setColumnCount(len(columns))
-        self.recordings_table.setHorizontalHeaderLabels(columns)
+        self.recordings_table.setColumnCount(len(keys))
+        self.recordings_table.setHorizontalHeaderLabels(keys)
         self.recordings_table.setRowCount(len(result))
 
         # перебираем элементы
@@ -104,7 +122,7 @@ class RecordingsWindow(QWidget, Ui_Form):
 
                     col = cur.execute(que).fetchall()[0][0]
 
-                elif columns[j] == 'difficult_id':
+                elif columns[j] == 'difficulty_id':
                     que = f"""
                     SELECT mode FROM Difficults
                         WHERE difficulty_id={col}"""
@@ -439,7 +457,7 @@ if __name__ == '__main__':
     # показ экземпляра
     ex.show()
 
-    recordings_window = RecordingsWindow('Гость')
+    recordings_window = RecordingsWindow('Гость', 'light')
 
     recordings_window.show()
     # при завершение исполнения QApplication завершить программу

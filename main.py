@@ -213,9 +213,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     # функция сравнения текстов из generated_text и entered_text
     def compare_texts(self):
         cursor = self.entered_text.textCursor()
+        font_size = 4
+        is_correct = True
         generated_text = self.generated_text.text()
         entered_text = self.entered_text.toPlainText()
-        is_correct = True
         html = ""
         for index, character in enumerate(entered_text):
             if index <= len(generated_text) - 1:
@@ -223,8 +224,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                     is_correct = False
             else:
                 is_correct = False
-            color = GREEN if is_correct else RED
-            html += f"<font color='{color}' size = {4} >{character}</font>"
+            text_color = GREEN if is_correct else RED
+            html += f"<font color='{text_color}' size = {font_size} >{character}</font>"
         self.is_program_change = True
         self.entered_text.setHtml(html)
         self.is_program_change = False
@@ -432,7 +433,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
 
 class ResultsDialog(QDialog, Ui_Dialog):
-    def __init__(self, time, result):
+    def __init__(self, time, result, theme):
         super().__init__()  # конструктор родительского класса
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         self.setupUi(self)
@@ -443,10 +444,14 @@ class ResultsDialog(QDialog, Ui_Dialog):
         # num = randint(1, 5)  # получение рандомного номера картинки
         # pixmap = QPixmap(f"data\\image_{num}")  # получение картинки из data
         # self.image_label.setPixmap(pixmap)  # вставка картинки в label
+        self.change_theme(theme)
 
     # функция для закрытия окна на нажатие ОК
     def accept_data(self):
         self.close()
+
+    def change_theme(self, theme):
+        pass
 
 
 if __name__ == '__main__':

@@ -24,6 +24,7 @@ if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
 
 # константы
 DATABASE = "data\\trainer_db.db"
+
 GREEN = '#49DC01'
 RED = '#DC143C'
 GRAY1 = "#383838"
@@ -206,17 +207,16 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
         # при изменении текста в entered_text вызвать функцию text_changed
         self.entered_text.textChanged.connect(self.text_changed)
-        # цвет для выделения правильного текста
-        self.correct_color = "#49dc00"
-        #
-        self.incorrect_color = "#DC143C"
+        # цвет для выделения правильного текста и неправильного текста
+        self.correct_color = GREEN
+        self.incorrect_color = RED
 
         self.load_text(self.difficulty_mode)
 
     # обработчик событий нажатия клавиш и мыши
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:  # при нажатие на esc начать заново
-            self.start_again()
+            self.load_text(self.difficulty_mode)
 
     # начать заново ввод текста
     def start_again(self):
@@ -258,9 +258,9 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def compare_texts(self):
         cursor = self.entered_text.textCursor()
         font_size = 4
+        is_correct = True
         generated_text = self.generated_text.text()
         entered_text = self.entered_text.toPlainText()
-        is_correct = True
         html = ""
         for index, character in enumerate(entered_text):
             if index <= len(generated_text) - 1:
@@ -326,11 +326,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # функция показа результата пользователя
     def show_result(self, time, typing_speed):
-        self.stopwatch.stop()  # остановка секундомера
         dialog = ResultsDialog(time, typing_speed, self.theme)
         dialog.show()
         dialog.exec()
-        self.start_again()
+        self.load_text(self.difficulty_mode)
 
     # запуск секундомера
     def start_stopwatch(self):
@@ -523,7 +522,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         if ok_pressed:
             # если пользователь уже существует, то вызвать окно с ошибкой
             cur = self.con.cursor()
-            users_id = [''.join(elem) for elem in cur.execute("""SELECT nickname FROM Users""").fetchall()]
+            users_id = map(lambda x: x[0], cur.execute("""SELECT nickname FROM Users""").fetchall())
             if username in users_id:
                 error_message = QMessageBox(self)
                 error_message.setIcon(QMessageBox.Critical)
@@ -549,13 +548,15 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         cur = self.con.cursor()
 
         # получение ника для входа
-        users_id = [''.join(elem) for elem in cur.execute("""SELECT nickname FROM Users""").fetchall()]
+        users_id = map(lambda x: x[0], cur.execute("""SELECT nickname FROM Users""").fetchall())
 
         username, ok_pressed = QInputDialog.getItem(self, "Вход", "Выберите пользователя: ",
                                                     users_id, 1, False)
         # если пользователь нажал на ОК, то сменить пользователя
         if ok_pressed:
             self.user = username  # смена пользователя
+            # изменить ник отображаемый в окне
+            self.username_label.setText(username)
 
     # функция, которая вызывается, когда закрывается окно
     def closeEvent(self, *args, **kwargs):
@@ -573,7 +574,7 @@ class ResultsDialog(QDialog, Ui_Dialog):
         self.button_box.accepted.connect(self.accept_data)  # привязка функции кнопки ОК
 
         self.time_label.setText(f"Общее время: {time}")
-        self.cpm_label.setText(f"Символов в минуту: {result}")
+        self.cpm_label.setText(f"Символов в минуту: {result:.{1}f}")
         # if result < 100:
         #     img = "image1.jpg"
         # elif 100 <= result < 170:
@@ -596,7 +597,6 @@ class ResultsDialog(QDialog, Ui_Dialog):
         self.close()
 
     def change_theme(self, theme):
-        print("Koten")
         if theme == "dark":
             self.setStyleSheet(f"background-color: {GRAY1}; color: {YELLOW}")
         elif theme == "light":
@@ -604,9 +604,7 @@ class ResultsDialog(QDialog, Ui_Dialog):
         elif theme == "ocean":
             self.setStyleSheet(f"background-color: {OCEAN_BLUE}; color: {OCEAN_YELLOW}")
         elif theme == "pastel":
-            print("Koten2")
             self.setStyleSheet(f"background-color: white; color: {PASTEL_BLUE}")
-            print("Koten3")
         elif theme == "violet":
             self.setStyleSheet(f"background-color: {PURPLE}; color: {YELLOW}")
         elif theme == "forest":

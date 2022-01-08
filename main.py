@@ -82,20 +82,21 @@ class RecordingsWindow(QWidget, Ui_Form):
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         self.setupUi(self)
 
+        self.con = sqlite3.connect(DATABASE)
+        self.user = user
+
         self.change_theme(theme)  # устанавливаем тему
         self.username_labe.setText(user)  # устанавливаем пользователя
         self.load_table(user)  # заргужаем таблицу
+        self.delete_btn.clicked.connect(self.delete_elem)
 
     def load_table(self, user):
         # столбцы таблицы
         keys = ['record_id', 'user', 'data', 'text', 'difficulty', 'time', 'typing_speed']
         columns = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
 
-        # связываемся с базой данных
-        con = sqlite3.connect(DATABASE)
-
         # Создание курсора
-        cur = con.cursor()
+        cur = self.con.cursor()
 
         # получаем данные из бд путем запроса
         result = cur.execute(f"""
@@ -129,8 +130,28 @@ class RecordingsWindow(QWidget, Ui_Form):
 
                     col = cur.execute(que).fetchall()[0][0]
 
-                # загружаем элемент и делаем его неприкосновенным
-                self.recordings_table.setItem(i, j, create_item(str(col), Qt.ItemIsEnabled))
+                # загружаем элемент
+                self.recordings_table.setItem(i, j, QTableWidgetItem(str(col)))
+
+        # делаем таблицу нередактируемой
+        self.recordings_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
+    def delete_elem(self):
+        # Получаем список элементов без повторов и их id
+        rows = list(set([i.row() for i in self.recordings_table.selectedItems()]))
+        ids = [self.recordings_table.item(i, 0).text() for i in rows]
+        # Спрашиваем у пользователя подтверждение на удаление элементов
+        valid = QMessageBox.question(
+            self, '', "Действительно удалить элементы с id " + ",".join(ids),
+            QMessageBox.Yes, QMessageBox.No)
+        # Если пользователь ответил утвердительно, удаляем элементы.
+        # Не забываем зафиксировать изменения
+        if valid == QMessageBox.Yes:
+            cur = self.con.cursor()
+            cur.execute("DELETE FROM Recordings WHERE record_id IN (" + ", ".join(
+                '?' * len(ids)) + ")", ids)
+            self.con.commit()
+        self.load_table(self.user)
 
     # функция смены темы
     def change_theme(self, theme):
@@ -279,7 +300,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     # функция показа результата пользователя
     def show_result(self, time, typing_speed):
         self.stopwatch.stop()  # остановка секундомера
-        dialog = ResultsDialog(time, typing_speed)
+        dialog = ResultsDialog(time, typing_speed, self.theme)
         dialog.show()
         dialog.exec()
 
@@ -461,5 +482,8 @@ if __name__ == '__main__':
     ex = MyWidget()
     # показ экземпляра
     ex.show()
+
+    a = RecordingsWindow('Гость', 'dark')
+    a.show()
     # при завершение исполнения QApplication завершить программу
     sys.exit(app.exec())

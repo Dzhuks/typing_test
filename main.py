@@ -26,6 +26,10 @@ if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
 DATABASE = "data\\trainer_db.db"
 GREEN = '#49DC01'
 RED = '#DC143C'
+GRAY1 = "#383838"
+GRAY2 = "#7a7a7a"
+YELLOW = "#f0df1c"
+BLUE = "#0e46ff"
 
 
 # конвертирование sql запроса в csv файл
@@ -296,6 +300,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
         self.con.commit()
 
+    def show_recordings(self):
+        recordings_window = RecordingsWindow(self.user, self.theme)
+        recordings_window.show()
+
     # функция показа результата пользователя
     def show_result(self, time, typing_speed):
         self.stopwatch.stop()  # остановка секундомера
@@ -366,6 +374,9 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
         # настройки пользователя
         self.register_user.triggered.connect(self.registration)
+        self.login_user.triggered.connect(self.login)
+
+        self.results_menu.triggered.connect(self.show_recordings)
 
     # функция установки светлой темы
     def set_light_theme(self):
@@ -409,8 +420,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         if ok_pressed:
             # если пользователь уже существует, то вызвать окно с ошибкой
             cur = self.con.cursor()
-            cur.execute("""SELECT nickname FROM Users""")
-            if username in self.users_id:
+            users_id = [''.join(elem) for elem in cur.execute("""SELECT nickname FROM Users""").fetchall()]
+            if username in users_id:
                 error_message = QMessageBox(self)
                 error_message.setIcon(QMessageBox.Critical)
                 error_message.setText("Пользователь уже существует!")
@@ -422,26 +433,21 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             # поменять пользователя
             self.user = username
 
-            # Создание курсора
-            cur = self.con.cursor()
-
             # добавляем пользователя в таблицу Users из БД
             cur.execute(f"INSERT INTO Users(nickname) VALUES('{username}')")
 
             # зафиксировать изменения в БД
             self.con.commit()
 
-            # присвоение пользователю username id путем запроса из таблицы Users
-            self.users_id[username] = int(cur.execute(f"""
-            SELECT user_id FROM Users
-                WHERE nickname = '{username}'""").fetchall()[0][0])
-            print(self.users_id)
-
     # функция для входа в пользователя
     def login(self):
+        cur = self.con.cursor()
+
         # получение ника для входа
+        users_id = [''.join(elem) for elem in cur.execute("""SELECT nickname FROM Users""").fetchall()]
+
         username, ok_pressed = QInputDialog.getItem(self, "Вход", "Выберите пользователя: ",
-                                                    self.users_id.keys(), 1, False)
+                                                    users_id, 1, False)
         # если пользователь нажал на ОК, то сменить пользователя
         if ok_pressed:
             self.user = username  # смена пользователя

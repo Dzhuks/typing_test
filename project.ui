@@ -48,7 +48,7 @@ border-color: rgb(255, 255, 255);
 </string>
        </property>
        <property name="text">
-        <string>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequa</string>
+        <string/>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -102,7 +102,7 @@ border-color: rgb(255, 255, 0);</string>
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Calibri'; font-size:18pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2';&quot;&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequa&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
@@ -178,6 +178,11 @@ p, li { white-space: pre-wrap; }
      </property>
      <addaction name="dark_theme"/>
      <addaction name="light_theme"/>
+     <addaction name="ocean_theme"/>
+     <addaction name="pastel_theme"/>
+     <addaction name="violet_theme"/>
+     <addaction name="forest_theme"/>
+     <addaction name="glamour_theme"/>
     </widget>
     <widget class="QMenu" name="difficulty_setting">
      <property name="title">
@@ -252,6 +257,31 @@ p, li { white-space: pre-wrap; }
   <action name="results_menu">
    <property name="text">
     <string>Результаты</string>
+   </property>
+  </action>
+  <action name="ocean_theme">
+   <property name="text">
+    <string>Океан</string>
+   </property>
+  </action>
+  <action name="pastel_theme">
+   <property name="text">
+    <string>Сирень</string>
+   </property>
+  </action>
+  <action name="violet_theme">
+   <property name="text">
+    <string>Виолет</string>
+   </property>
+  </action>
+  <action name="forest_theme">
+   <property name="text">
+    <string>Лес</string>
+   </property>
+  </action>
+  <action name="glamour_theme">
+   <property name="text">
+    <string>Гламур</string>
    </property>
   </action>
  </widget>

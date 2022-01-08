@@ -35,6 +35,7 @@ class Ui_MainWindow(object):
         self.generated_text.setStyleSheet("color: rgb(240, 223, 28);\n"
 "border-color: rgb(255, 255, 255);\n"
 "")
+        self.generated_text.setText("")
         self.generated_text.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.generated_text.setWordWrap(True)
         self.generated_text.setObjectName("generated_text")
@@ -114,8 +115,23 @@ class Ui_MainWindow(object):
         self.login_user.setObjectName("login_user")
         self.results_menu = QtWidgets.QAction(MainWindow)
         self.results_menu.setObjectName("results_menu")
+        self.ocean_theme = QtWidgets.QAction(MainWindow)
+        self.ocean_theme.setObjectName("ocean_theme")
+        self.pastel_theme = QtWidgets.QAction(MainWindow)
+        self.pastel_theme.setObjectName("pastel_theme")
+        self.violet_theme = QtWidgets.QAction(MainWindow)
+        self.violet_theme.setObjectName("violet_theme")
+        self.forest_theme = QtWidgets.QAction(MainWindow)
+        self.forest_theme.setObjectName("forest_theme")
+        self.glamour_theme = QtWidgets.QAction(MainWindow)
+        self.glamour_theme.setObjectName("glamour_theme")
         self.theme_setting.addAction(self.dark_theme)
         self.theme_setting.addAction(self.light_theme)
+        self.theme_setting.addAction(self.ocean_theme)
+        self.theme_setting.addAction(self.pastel_theme)
+        self.theme_setting.addAction(self.violet_theme)
+        self.theme_setting.addAction(self.forest_theme)
+        self.theme_setting.addAction(self.glamour_theme)
         self.difficulty_setting.addAction(self.easy_mode)
         self.difficulty_setting.addAction(self.normal_mode)
         self.difficulty_setting.addAction(self.hard_mode)
@@ -135,13 +151,12 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.generated_text.setText(_translate("MainWindow", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequa"))
         self.hint_label.setText(_translate("MainWindow", "Нажмите Esc чтобы начать заново"))
         self.entered_text.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Calibri\'; font-size:18pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\';\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequa</span></p></body></html>"))
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.stopwatch_label.setText(_translate("MainWindow", "00:00"))
         self.username_label.setText(_translate("MainWindow", "Гость"))
         self.settings_menu.setTitle(_translate("MainWindow", "Настройки"))
@@ -158,3 +173,8 @@ class Ui_MainWindow(object):
         self.register_user.setText(_translate("MainWindow", "Регистрация"))
         self.login_user.setText(_translate("MainWindow", "Войти"))
         self.results_menu.setText(_translate("MainWindow", "Результаты"))
+        self.ocean_theme.setText(_translate("MainWindow", "Океан"))
+        self.pastel_theme.setText(_translate("MainWindow", "Сирень"))
+        self.violet_theme.setText(_translate("MainWindow", "Виолет"))
+        self.forest_theme.setText(_translate("MainWindow", "Лес"))
+        self.glamour_theme.setText(_translate("MainWindow", "Гламур"))

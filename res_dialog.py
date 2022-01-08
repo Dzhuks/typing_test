@@ -15,12 +15,13 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(489, 300)
-        Dialog.setStyleSheet("background-color: rgb(56, 56, 56);")
+        Dialog.setStyleSheet("background-color: rgb(56, 56, 56);\n"
+"color: rgb(240, 223, 28);\n"
+"")
         self.button_box = QtWidgets.QDialogButtonBox(Dialog)
         self.button_box.setGeometry(QtCore.QRect(40, 240, 411, 51))
         self.button_box.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.button_box.setStyleSheet("color: rgb(240, 223, 28);\n"
-"")
+        self.button_box.setStyleSheet("")
         self.button_box.setOrientation(QtCore.Qt.Horizontal)
         self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
         self.button_box.setCenterButtons(True)
@@ -39,24 +40,21 @@ class Ui_Dialog(object):
         font = QtGui.QFont()
         font.setPointSize(14)
         self.comment_label.setFont(font)
-        self.comment_label.setStyleSheet("color: rgb(240, 223, 28);\n"
-"")
+        self.comment_label.setStyleSheet("")
         self.comment_label.setObjectName("comment_label")
         self.verticalLayout.addWidget(self.comment_label)
         self.cpm_label = QtWidgets.QLabel(self.verticalLayoutWidget)
         font = QtGui.QFont()
         font.setPointSize(12)
         self.cpm_label.setFont(font)
-        self.cpm_label.setStyleSheet("color: rgb(240, 223, 28);\n"
-"")
+        self.cpm_label.setStyleSheet("")
         self.cpm_label.setObjectName("cpm_label")
         self.verticalLayout.addWidget(self.cpm_label)
         self.time_label = QtWidgets.QLabel(self.verticalLayoutWidget)
         font = QtGui.QFont()
         font.setPointSize(12)
         self.time_label.setFont(font)
-        self.time_label.setStyleSheet("color: rgb(240, 223, 28);\n"
-"")
+        self.time_label.setStyleSheet("")
         self.time_label.setObjectName("time_label")
         self.verticalLayout.addWidget(self.time_label)
 

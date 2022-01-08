@@ -132,7 +132,7 @@ p, li { white-space: pre-wrap; }
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="username_label">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -198,6 +198,7 @@ p, li { white-space: pre-wrap; }
     <addaction name="theme_setting"/>
     <addaction name="difficulty_setting"/>
     <addaction name="user_setting"/>
+    <addaction name="results_menu"/>
    </widget>
    <widget class="QMenu" name="about_menu">
     <property name="title">
@@ -246,6 +247,11 @@ p, li { white-space: pre-wrap; }
   <action name="login_user">
    <property name="text">
     <string>Войти</string>
+   </property>
+  </action>
+  <action name="results_menu">
+   <property name="text">
+    <string>Результаты</string>
    </property>
   </action>
  </widget>

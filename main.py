@@ -169,7 +169,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.con = sqlite3.connect(DATABASE)
 
         self.difficulty_mode = 'easy'  # легкий режим по умолчанию
-        self.users_id = {}
         self.load_users()
         self.user = "Гость"  # пользователь по умолчанию
 
@@ -303,6 +302,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         dialog = ResultsDialog(time, typing_speed, self.theme)
         dialog.show()
         dialog.exec()
+        self.start_again()
 
     # запуск секундомера
     def start_stopwatch(self):
@@ -349,21 +349,14 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         if len(users) == 0:
             # добавление в таблицу Users Гостя
             cur.execute("INSERT INTO Users(nickname) VALUES('Гость')")
-            # присваение Гостю id 1
-            self.users_id["Гость"] = 1
             # зафиксировать изменения в БД
             self.con.commit()
-        else:
-            # установка к каждому пользователю свой id
-            for user in users:
-                self.users_id[user[1]] = user[0]
-                print(user)
 
     # функция для привязки частей интерфейса к функциям
     def interface_binding(self):
         # настройки темы
-        self.dark_theme.triggered.connect(lambda: self.change_theme("dark"))
-        self.light_theme.triggered.connect(lambda: self.change_theme("light"))
+        self.dark_theme.triggered.connect(self.set_dark_theme)
+        self.light_theme.triggered.connect(self.set_light_theme)
 
         # настройки сложности
         self.easy_mode.triggered.connect(lambda: self.change_difficulty('easy'))
@@ -374,10 +367,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         # настройки пользователя
         self.register_user.triggered.connect(self.registration)
 
-    # функция изменения темы
-    def change_theme(self, theme):
-        if theme == "light" and theme != self.theme:
-            # установка светлой темы
+    # функция установки светлой темы
+    def set_light_theme(self):
+        # если светлая тема еще не установлена
+        if self.theme != "light":
             self.theme = "light"
             self.setStyleSheet("color: black")
             self.generated_text.setStyleSheet("color: rgb(14, 70, 255);")
@@ -385,14 +378,18 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.hint_label.setStyleSheet("color: rgb(122, 122, 122);")
             self.stopwatch_label.setStyleSheet("color: rgb(14, 70, 255);")
             self.menubar.setStyleSheet("color: black;")
-        elif theme == "dark" and theme != self.theme:
-            # установка темной темы
+
+    # функция установки темной темы
+    def set_dark_theme(self):
+        # если темная тема еще не установлена
+        if self.theme != "dark":
             self.theme = "dark"
-            self.setStyleSheet("background-color: rgb(56, 56, 56); color: white;")
-            self.generated_text.setStyleSheet("color: rgb(240, 223, 28);")
-            self.entered_text.setStyleSheet("color: rgb(73, 220, 0);")
-            self.hint_label.setStyleSheet("color: rgb(161, 161, 161);")
-            self.stopwatch_label.setStyleSheet("color: rgb(240, 223, 28);")
+            self.setStyleSheet(f"background-color: {GRAY1}; color: white;")
+            self.generated_text.setStyleSheet(f"color: {YELLOW};")
+            self.entered_text.setStyleSheet(f"color: {GREEN};")
+            self.hint_label.setStyleSheet(f"color: {GRAY2};")
+            self.stopwatch_label.setStyleSheet(f"color: {YELLOW};")
+            self.username_label.setStyleSheet(f"color: {YELLOW  }")
             self.menubar.setStyleSheet("color: white;")
 
     # функция изменения сложности
@@ -411,6 +408,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         # если пользователь нажал на ОК, то добавить его в таблицу Users в БД
         if ok_pressed:
             # если пользователь уже существует, то вызвать окно с ошибкой
+            cur = self.con.cursor()
+            cur.execute("""SELECT nickname FROM Users""")
             if username in self.users_id:
                 error_message = QMessageBox(self)
                 error_message.setIcon(QMessageBox.Critical)
@@ -455,7 +454,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
 class ResultsDialog(QDialog, Ui_Dialog):
     def __init__(self, time, result, theme):
-        super().__init__()  # конструктор родительского класса
+        QDialog.__init__(self)  # конструктор родительского класса
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         self.setupUi(self)
         self.button_box.accepted.connect(self.accept_data)  # привязка функции кнопки ОК
@@ -482,8 +481,5 @@ if __name__ == '__main__':
     ex = MyWidget()
     # показ экземпляра
     ex.show()
-
-    a = RecordingsWindow('Гость', 'dark')
-    a.show()
     # при завершение исполнения QApplication завершить программу
     sys.exit(app.exec())

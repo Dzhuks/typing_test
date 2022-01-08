@@ -2,19 +2,17 @@
 import sqlite3
 import sys
 import time
+import csv
+import datetime
 from random import choice, randint
 from project import Ui_MainWindow
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QMainWindow, QDialog, QWidget
-from PyQt5.QtCore import QTimer
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QInputDialog, QMessageBox
-from PyQt5 import QtCore, QtWidgets
-import csv
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtGui import QPixmap
 from res_dialog import Ui_Dialog
-
+from recordings_window import Ui_Form
+from PyQt5.QtWidgets import QDialog, QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QTableWidgetItem
+from PyQt5.QtCore import QTimer, Qt
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtGui import QTextCursor, QPixmap
 
 # адаптация к экранам с высоким разрешением (HiRes)
 if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
@@ -22,7 +20,6 @@ if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
 
 if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
-
 
 # константы
 DATABASE = "data\\trainer_db.db"
@@ -55,16 +52,17 @@ FOREST_BROWN = "#81593e"
 FOREST_LIGHT_GREEN = "#ebffb4"
 FOREST_RED = "#d03739"
 
+
 # конвертирование sql запроса в csv файл
-def convert_sql_to_csv(name, request):  # в функцию передаем имя файла и сам запрос
-    # связываемся с базой данных trainer_db.db
+def convert_sql_to_csv(name, que):  # в функцию передаем имя файла и запрос
+    # связываемся с базой данных
     con = sqlite3.connect(DATABASE)
 
     # Создание курсора
     cur = con.cursor()
 
-    # Выполнение запроса и получение всех результатов
-    data = cur.execute(request).fetchall()
+    # получаем данные из бд путем запроса
+    data = cur.execute(que).fetchall()
 
     # ключи csv файла
     titles = [description[0] for description in cur.description]
@@ -80,19 +78,109 @@ def convert_sql_to_csv(name, request):  # в функцию передаем и�
 
 
 # конвертирование sql запроса в csv файл
-def convert_sql_to_txt(name, request):  # в функцию передаем имя файла и сам запрос
-    # связываемся с базой данных trainer_db.db
+def convert_sql_to_txt(name, que):  # в функцию передаем имя файла и запрос
+    # связываемся с базой данных
     con = sqlite3.connect(DATABASE)
 
     # Создание курсора
     cur = con.cursor()
 
-    # Выполнение запроса и получение всех результатов
-    data = cur.execute(request).fetchall()
+    # получаем данные из бд путем запроса
+    data = cur.execute(que).fetchall()
 
     with open(name, 'w+') as txt_file:  # открываем файл, если он есть, а иначе создаем его
         for elem in data:
-            txt_file.write(elem[0])
+            txt_file.write(' '.join(elem))
+            txt_file.write('\n')
+
+
+# создание QTableWidgetItem с flags
+def create_item(text, flags):
+    table_widget_item = QTableWidgetItem(text)
+    table_widget_item.setFlags(flags)
+    return table_widget_item
+
+
+class RecordingsWindow(QWidget, Ui_Form):
+    def __init__(self, user, theme):
+        super().__init__()  # конструктор родительского класса
+        # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
+        self.setupUi(self)
+
+        self.con = sqlite3.connect(DATABASE)
+        self.user = user
+
+        self.change_theme(theme)  # устанавливаем тему
+        self.username_labe.setText(user)  # устанавливаем пользователя
+        self.load_table(user)  # заргужаем таблицу
+        self.delete_btn.clicked.connect(self.delete_elem)
+
+    def load_table(self, user):
+        # столбцы таблицы
+        keys = ['record_id', 'user', 'data', 'text', 'difficulty', 'time', 'typing_speed']
+        columns = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
+
+        # Создание курсора
+        cur = self.con.cursor()
+
+        # получаем данные из бд путем запроса
+        result = cur.execute(f"""
+        SELECT {', '.join(columns)} FROM Recordings
+            WHERE user_id=(
+        SELECT user_id FROM Users WHERE nickname='{user}')
+        """).fetchall()
+
+        # устанавливаем имена столбцов и количество рядов, столбцов
+        self.recordings_table.setColumnCount(len(keys))
+        self.recordings_table.setHorizontalHeaderLabels(keys)
+        self.recordings_table.setRowCount(len(result))
+
+        # перебираем элементы
+        for i, row in enumerate(result):
+            for j, col in enumerate(row):
+                # подменяем элемент с id на его значение
+                if columns[j] == 'user_id':
+                    col = user
+                elif columns[j] == 'text_id':
+                    que = f"""
+                    SELECT text FROM Texts
+                        WHERE text_id={col}"""
+
+                    col = cur.execute(que).fetchall()[0][0]
+
+                elif columns[j] == 'difficulty_id':
+                    que = f"""
+                    SELECT mode FROM Difficults
+                        WHERE difficulty_id={col}"""
+
+                    col = cur.execute(que).fetchall()[0][0]
+
+                # загружаем элемент
+                self.recordings_table.setItem(i, j, QTableWidgetItem(str(col)))
+
+        # делаем таблицу нередактируемой
+        self.recordings_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
+    def delete_elem(self):
+        # Получаем список элементов без повторов и их id
+        rows = list(set([i.row() for i in self.recordings_table.selectedItems()]))
+        ids = [self.recordings_table.item(i, 0).text() for i in rows]
+        # Спрашиваем у пользователя подтверждение на удаление элементов
+        valid = QMessageBox.question(
+            self, '', "Действительно удалить элементы с id " + ",".join(ids),
+            QMessageBox.Yes, QMessageBox.No)
+        # Если пользователь ответил утвердительно, удаляем элементы.
+        # Не забываем зафиксировать изменения
+        if valid == QMessageBox.Yes:
+            cur = self.con.cursor()
+            cur.execute("DELETE FROM Recordings WHERE record_id IN (" + ", ".join(
+                '?' * len(ids)) + ")", ids)
+            self.con.commit()
+        self.load_table(self.user)
+
+    # функция смены темы
+    def change_theme(self, theme):
+        pass
 
 
 # Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом
@@ -120,20 +208,20 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.stopwatch.timeout.connect(self.show_stopwatch)
         self.start_time = 0  # время начало ввода
         self.timeInterval = 100  # интервал вызова секундомера
+        self.time_r = 0  # разница между начальным временем и текущем временем. Изначально равен 0
 
+        self.load_text(self.difficulty_mode)
         # при изменении текста в entered_text вызвать функцию text_changed
         self.entered_text.textChanged.connect(self.text_changed)
         # цвет для выделения правильного текста
         self.correct_color = "#49dc00"
-        #
+        # цвет для выделения неправильного текста
         self.incorrect_color = "#DC143C"
-
-        self.load_text(self.difficulty_mode)
 
     # обработчик событий нажатия клавиш и мыши
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:  # при нажатие на esc начать заново
-            self.load_text(self.difficulty_mode)
+            self.start_again()
 
     # начать заново ввод текста
     def start_again(self):
@@ -174,11 +262,10 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     # функция сравнения текстов из generated_text и entered_text
     def compare_texts(self):
         cursor = self.entered_text.textCursor()
+        font_size = 4
+        is_correct = True
         generated_text = self.generated_text.text()
         entered_text = self.entered_text.toPlainText()
-        is_correct = True
-        green = self.correct_color
-        red = self.incorrect_color
         html = ""
         for index, character in enumerate(entered_text):
             if index <= len(generated_text) - 1:
@@ -186,28 +273,70 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                     is_correct = False
             else:
                 is_correct = False
-            color = green if is_correct else red
-            html += f"<font color='{color}' size = {4} >{character}</font>"
+            text_color = self.correct_color if is_correct else self.incorrect_color
+            html += f"<font color='{text_color}' size = {font_size} >{character}</font>"
         self.is_program_change = True
         self.entered_text.setHtml(html)
         self.is_program_change = False
         self.entered_text.setTextCursor(cursor)
         if is_correct and len(entered_text) == len(generated_text):
-            self.show_result()
+            self.show_and_load_recording()
+
+    def show_and_load_recording(self):
+        # Создание курсора
+        cur = self.con.cursor()
+
+        # Получение user_id путем запроса из таблицы Users
+        user_id = cur.execute(f"""
+            SELECT user_id FROM Users 
+                WHERE nickname='{self.user}'""").fetchall()[0][0]
+
+        # Получение текущей даты при помощи библиотеки datetime
+        data = datetime.datetime.now().date()
+
+        # Получение text_id путем запроса из таблицы Texts
+        text_id = cur.execute(f"""
+            SELECT text_id FROM Texts
+                WHERE text='{self.generated_text.text()}'""").fetchall()[0][0]
+
+        # Получение difficulty_id путем запроса из таблицы Texts
+        difficulty_id = cur.execute(f"""
+            SELECT difficulty_id FROM Difficults
+                WHERE mode='{self.difficulty_mode}'""").fetchall()[0][0]
+
+        # Получение time через self.stopwatch_label.text()
+        time = self.stopwatch_label.text()
+
+        # typing_speed = S / time * 60 сим/мин
+        typing_speed = len(self.generated_text.text()) / self.time_r * 60
+
+        # добавляем запись в бд и показываем результат пользователю
+        self.load_recording(user_id, data, text_id, difficulty_id, time, typing_speed)
+        self.show_result(time, typing_speed)
+
+    def load_recording(self, user_id, data, text_id, difficulty_id, time, typing_speed):
+        # Создание курсора
+        cur = self.con.cursor()
+
+        que = f"""INSERT INTO Recordings(user_id, data, text_id, difficulty_id, time, typing_speed) 
+        VALUES ({user_id}, {data}, {text_id}, {difficulty_id}, '{time}', {typing_speed})"""
+
+        cur.execute(que)
+
+        self.con.commit()
 
     # функция показа результата пользователя
-    def show_result(self):
-        dialog = ResultsDialog("1:30", 250, self.theme)
-        print("Loten before show")
+    def show_result(self, time, typing_speed):
+        self.stopwatch.stop()  # остановка секундомера
+        dialog = ResultsDialog(time, typing_speed, self.theme)
         dialog.show()
         dialog.exec()
-        print("Koten total")
-        self.load_text(self.difficulty_mode)
 
     # запуск секундомера
     def start_stopwatch(self):
         self.is_stopwatch_start = True
         self.start_time = time.time()  # в качестве начального времени установить текущее время
+        self.time_r = 0  # Обнулить разницу во времени
         self.stopwatch_label.setText('00:00')
         self.stopwatch.start(self.timeInterval)  # запуск секундомера с итервалом timeInterval
 
@@ -215,17 +344,18 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def reset_stopwatch(self):
         self.is_stopwatch_start = False
         self.start_time = 0  # в качестве начального времени установить 0
+        self.time_r = 0  # Обнулить разницу во времени
         self.stopwatch_label.setText('00:00')
         self.stopwatch.stop()  # остановка секундомера
 
     # функция показа значения секундомера
     def show_stopwatch(self):
-        # разница между начальным временем и текущем временем
-        time_r = int(time.time() - self.start_time)
+        # обновить разницу во времени
+        self.time_r = int(time.time() - self.start_time)
 
         # перевод времени в минуту и секунду
-        minutes = time_r // 60
-        seconds = time_r % 60
+        minutes = self.time_r // 60
+        seconds = self.time_r % 60
         if minutes > 59:  # если минут больше чем 59, то вывод максимального времени
             self.timer_label.setText('59:59')
         else:
@@ -298,7 +428,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.entered_text.setStyleSheet(f"color: {GREEN};")
             self.hint_label.setStyleSheet(f"color: {GRAY2};")
             self.stopwatch_label.setStyleSheet(f"color: {YELLOW};")
-            self.username_label.setStyleSheet(f"color: {YELLOW  }")
+            self.username_label.setStyleSheet(f"color: {YELLOW}")
             self.menubar.setStyleSheet("color: white;")
 
     # функция установки океанной темы
@@ -343,7 +473,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.entered_text.setStyleSheet(f"color: {GREEN};")
             self.hint_label.setStyleSheet(f"color: {GRAY2};")
             self.stopwatch_label.setStyleSheet(f"color: {YELLOW};")
-            self.username_label.setStyleSheet(f"color: {YELLOW  }")
+            self.username_label.setStyleSheet(f"color: {YELLOW}")
             self.menubar.setStyleSheet("color: white;")
 
     # функция установки лесной темы
@@ -382,7 +512,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         # изменить сложность
         self.difficulty_mode = diff
 
-    # функция регистраций пользователя
+    # функция регистрации пользователя
     def registration(self):
         # вызов диалогового окна
         username, ok_pressed = QInputDialog.getText(self, "Регистрация", "Введите имя пользователя:")
@@ -438,54 +568,24 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
 class ResultsDialog(QDialog, Ui_Dialog):
     def __init__(self, time, result, theme):
-        QDialog.__init__(self)  # конструктор родительского класса
-        # Вызываем метод для загрузки интерфейса из класса Ui_Dialog,
+        super().__init__()  # конструктор родительского класса
+        # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         self.setupUi(self)
-        # изменение темы на тему основного окна
-        self.change_theme(theme)
         self.button_box.accepted.connect(self.accept_data)  # привязка функции кнопки ОК
 
         self.time_label.setText(f"Общее время: {time}")
-        self.cpm_label.setText(f"Символов в минуту: {result}")
-        # if result < 100:
-        #     img = "image1.jpg"
-        # elif 100 <= result < 170:
-        #     img = "image2.jpg"
-        # elif 170 <= result < 250:
-        #     img = "image3.jpg"
-        # elif 250 <= result <= 350:
-        #     img = "image4.jpg"
-        # else:
-        #     img = "image5.jpg"
-        # # try:
-        # #     pixmap = QPixmap(img)
-        # # except Exception:
-        # #     raise FileNotFoundError("Файлы с изображениями не найдены")
-        # pixmap = QPixmap(img)
+        self.cpm_label.setText(f"Символов в минуту: {result:.{1}f}")
+        # num = randint(1, 5)  # получение рандомного номера картинки
+        # pixmap = QPixmap(f"data\\image_{num}")  # получение картинки из data
         # self.image_label.setPixmap(pixmap)  # вставка картинки в label
+        self.change_theme(theme)
 
     # функция для закрытия окна на нажатие ОК
     def accept_data(self):
         self.close()
 
     def change_theme(self, theme):
-        print("Koten")
-        if theme == "dark":
-            self.setStyleSheet(f"background-color: {GRAY1}; color: {YELLOW}")
-        elif theme == "light":
-            self.setStyleSheet(f"background-color: white; color: {BLUE}")
-        elif theme == "ocean":
-            self.setStyleSheet(f"background-color: {OCEAN_BLUE}; color: {OCEAN_YELLOW}")
-        elif theme == "pastel":
-            print("Koten2")
-            self.setStyleSheet(f"background-color: white; color: {PASTEL_BLUE}")
-            print("Koten3")
-        elif theme == "violet":
-            self.setStyleSheet(f"background-color: {PURPLE}; color: {YELLOW}")
-        elif theme == "forest":
-            self.setStyleSheet(f"background-color: {FOREST_GREEN}; color: {FOREST_BROWN}")
-        elif theme == "glamour":
-            self.setStyleSheet(f"background-color: {GLAMOUR_PINK}; color: white")
+        pass
 
 
 if __name__ == '__main__':
@@ -495,5 +595,8 @@ if __name__ == '__main__':
     ex = MyWidget()
     # показ экземпляра
     ex.show()
+
+    a = RecordingsWindow('Гость', 'dark')
+    a.show()
     # при завершение исполнения QApplication завершить программу
     sys.exit(app.exec())

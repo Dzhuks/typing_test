@@ -64,6 +64,9 @@ class RecordingsWindow(QWidget, Ui_Form):
         self.con = sqlite3.connect(DATABASE)
         self.user = user
 
+        self.titles = ['record_id', 'user', 'data', 'text', 'mode', 'time', 'typing_speed']
+        self.columns = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
+
         self.change_theme(theme)  # устанавливаем тему
         self.username_labe.setText(self.user)  # устанавливаем пользователя
         self.load_table()  # заргужаем таблицу
@@ -71,39 +74,35 @@ class RecordingsWindow(QWidget, Ui_Form):
         self.pushButton.clicked.connect(self.show_dialog)
 
     def load_table(self):
-        # столбцы таблицы
-        keys = ['record_id', 'user', 'data', 'text', 'difficulty', 'time', 'typing_speed']
-        columns = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
-
         # Создание курсора
         cur = self.con.cursor()
 
         # получаем данные из бд путем запроса
         result = cur.execute(f"""
-        SELECT {', '.join(columns)} FROM Recordings
+        SELECT {', '.join(self.columns)} FROM Recordings
             WHERE user_id=(
         SELECT user_id FROM Users WHERE nickname='{self.user}')
         """).fetchall()
 
         # устанавливаем имена столбцов и количество рядов, столбцов
-        self.recordings_table.setColumnCount(len(keys))
-        self.recordings_table.setHorizontalHeaderLabels(keys)
+        self.recordings_table.setColumnCount(len(self.titles))
+        self.recordings_table.setHorizontalHeaderLabels(self.titles)
         self.recordings_table.setRowCount(len(result))
 
         # перебираем элементы
         for i, row in enumerate(result):
             for j, col in enumerate(row):
                 # подменяем элемент с id на его значение
-                if columns[j] == 'user_id':
+                if self.columns[j] == 'user_id':
                     col = self.user
-                elif columns[j] == 'text_id':
+                elif self.columns[j] == 'text_id':
                     que = f"""
                     SELECT text FROM Texts
                         WHERE text_id={col}"""
 
                     col = cur.execute(que).fetchall()[0][0]
 
-                elif columns[j] == 'difficulty_id':
+                elif self.columns[j] == 'difficulty_id':
                     que = f"""
                     SELECT mode FROM Difficults
                         WHERE difficulty_id={col}"""
@@ -146,23 +145,18 @@ class RecordingsWindow(QWidget, Ui_Form):
 
     # функция конвертирования в csv файл
     def convert_to_csv(self, filename):  # в функцию передаем имя файла
-        # столбцы таблиц
-        columns = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
-
         # Создание курсора
         cur = self.con.cursor()
 
         # получаем данные из бд путем запроса
         result = cur.execute(f"""
-            SELECT {', '.join(columns)} FROM Recordings
+            SELECT {', '.join(self.columns)} FROM Recordings
                 WHERE user_id=(
             SELECT user_id FROM Users WHERE nickname='{self.user}')""").fetchall()
 
-        titles = ['record_id', 'user', 'data', 'text', 'mode', 'time', 'typing_speed']
-
         with open(filename, 'w+', newline='') as csv_file:  # открываем файл, если он есть, а иначе создаем его
             writer = csv.DictWriter(
-                csv_file, fieldnames=titles,
+                csv_file, fieldnames=self.titles,
                 delimiter=';', quoting=csv.QUOTE_NONNUMERIC)  # объект для записи (writer)
             writer.writeheader()  # пишем заголовок titles
             # запись в csv файл
@@ -170,18 +164,18 @@ class RecordingsWindow(QWidget, Ui_Form):
                 # создаем словарь
                 dictionary = {}
                 for j, value in enumerate(elem):
-                    key = titles[j]
+                    key = self.titles[j]
                     # подменяем элемент с id на его значение
-                    if columns[j] == 'user_id':
+                    if self.columns[j] == 'user_id':
                         value = self.user
-                    elif columns[j] == 'text_id':
+                    elif self.columns[j] == 'text_id':
                         que = f"""
                             SELECT text FROM Texts
                                 WHERE text_id={value}"""
 
                         value = cur.execute(que).fetchall()[0][0]
 
-                    elif columns[j] == 'difficulty_id':
+                    elif self.columns[j] == 'difficulty_id':
                         que = f"""
                             SELECT mode FROM Difficults
                                 WHERE difficulty_id={value}"""
@@ -192,6 +186,11 @@ class RecordingsWindow(QWidget, Ui_Form):
                     dictionary[key] = value
 
                 writer.writerow(dictionary)
+
+    # функция, которая вызывается, когда закрывается окно
+    def closeEvent(self, *args, **kwargs):
+        # Закрытие соединение с базой данных при закрытие окна
+        self.con.close()
 
 
 # Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом
@@ -302,7 +301,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 WHERE nickname='{self.user}'""").fetchall()[0][0]
 
         # Получение текущей даты при помощи библиотеки datetime
-        data = datetime.datetime.now().date()
+        data = str(datetime.datetime.now().date())
 
         # Получение text_id путем запроса из таблицы Texts
         text_id = cur.execute(f"""
@@ -329,7 +328,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         cur = self.con.cursor()
 
         que = f"""INSERT INTO Recordings(user_id, data, text_id, difficulty_id, time, typing_speed) 
-        VALUES ({user_id}, {data}, {text_id}, {difficulty_id}, '{time}', {typing_speed})"""
+        VALUES ({user_id}, '{data}', {text_id}, {difficulty_id}, '{time}', {typing_speed})"""
 
         cur.execute(que)
 

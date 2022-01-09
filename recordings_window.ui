@@ -14,8 +14,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(56, 56, 56);
-color: rgb(240, 223, 28);</string>
+   <string notr="true"/>
   </property>
   <widget class="QTableWidget" name="recordings_table">
    <property name="geometry">
@@ -30,7 +29,7 @@ color: rgb(240, 223, 28);</string>
     <string notr="true">color: rgb(240, 223, 28);</string>
    </property>
   </widget>
-  <widget class="QLabel" name="username_labe">
+  <widget class="QLabel" name="username_label">
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -78,7 +77,7 @@ color: rgb(240, 223, 28);</string>
     <string>Удалить запись</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="convert_btn">
    <property name="geometry">
     <rect>
      <x>350</x>

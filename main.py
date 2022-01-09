@@ -11,7 +11,7 @@ from recordings_window import Ui_Form
 from PyQt5.QtWidgets import QDialog, QInputDialog, QMessageBox
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QTableWidgetItem
 from PyQt5.QtCore import QTimer, Qt
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtGui import QTextCursor, QPixmap
 
 # адаптация к экранам с высоким разрешением (HiRes)
@@ -77,23 +77,6 @@ def convert_sql_to_csv(name, que):  # в функцию передаем имя 
             writer.writerow({titles[i]: d[i] for i in range(len(titles))})
 
 
-# конвертирование sql запроса в csv файл
-def convert_sql_to_txt(name, que):  # в функцию передаем имя файла и запрос
-    # связываемся с базой данных
-    con = sqlite3.connect(DATABASE)
-
-    # Создание курсора
-    cur = con.cursor()
-
-    # получаем данные из бд путем запроса
-    data = cur.execute(que).fetchall()
-
-    with open(name, 'w+') as txt_file:  # открываем файл, если он есть, а иначе создаем его
-        for elem in data:
-            txt_file.write(' '.join(elem))
-            txt_file.write('\n')
-
-
 # создание QTableWidgetItem с flags
 def create_item(text, flags):
     table_widget_item = QTableWidgetItem(text)
@@ -111,7 +94,7 @@ class RecordingsWindow(QWidget, Ui_Form):
         self.user = user
 
         self.change_theme(theme)  # устанавливаем тему
-        self.username_labe.setText(user)  # устанавливаем пользователя
+        self.username_label.setText(user)  # устанавливаем пользователя
         self.load_table(user)  # заргужаем таблицу
         self.delete_btn.clicked.connect(self.delete_elem)
 
@@ -180,7 +163,32 @@ class RecordingsWindow(QWidget, Ui_Form):
 
     # функция смены темы
     def change_theme(self, theme):
-        pass
+        bg_color, text_color = None, None  # переменные для цветов фона и текста
+        # установка цветов для каждой темы
+        if theme == "dark":
+            bg_color = GRAY1
+            text_color = YELLOW
+        elif theme == "light":
+            bg_color = "white"
+            text_color = BLUE
+        elif theme == "ocean":
+            bg_color = OCEAN_BLUE
+            text_color = OCEAN_YELLOW
+        elif theme == "pastel":
+            bg_color = PASTEL_PURPLE
+            text_color = PASTEL_BLUE
+        elif theme == "violet":
+            bg_color = PURPLE
+            text_color = YELLOW
+        elif theme == "forest":
+            bg_color = FOREST_GREEN
+            text_color = FOREST_BROWN
+        elif theme == "glamour":
+            bg_color = GLAMOUR_PINK
+            text_color = "white"
+        # установка стилей для окна
+        self.setStyleSheet(f"""background-color: {bg_color};
+                               color: {text_color}""")
 
 
 # Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом
@@ -281,12 +289,13 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.entered_text.setTextCursor(cursor)
         if is_correct and len(entered_text) == len(generated_text):
             self.show_and_load_recording()
+            self.load_text(self.difficulty_mode)
 
     def show_and_load_recording(self):
         # Создание курсора
         cur = self.con.cursor()
 
-        # Получение user_id путем запроса из таблицы Users
+        # Получение user_id путем запроса из таблицы User
         user_id = cur.execute(f"""
             SELECT user_id FROM Users 
                 WHERE nickname='{self.user}'""").fetchall()[0][0]
@@ -329,8 +338,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def show_result(self, time, typing_speed):
         self.stopwatch.stop()  # остановка секундомера
         dialog = ResultsDialog(time, typing_speed, self.theme)
-        dialog.show()
-        dialog.exec()
 
     # запуск секундомера
     def start_stopwatch(self):
@@ -401,6 +408,14 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.register_user.triggered.connect(self.registration)
         self.login_user.triggered.connect(self.login)
 
+        # меню результатов
+        self.results_menu.triggered.connect(self.show_recordings)
+
+    def show_recordings(self):
+        recordings_win = RecordingsWindow(self.user, self.theme)
+        recordings_win.show()
+        recordings_win.exec()
+
     # функция установки светлой темы
     def set_light_theme(self):
         # если светлая тема еще не установлена
@@ -415,6 +430,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.stopwatch_label.setStyleSheet(f"color: {BLUE};")
             self.username_label.setStyleSheet(f"color: {BLUE}")
             self.menubar.setStyleSheet("color: black;")
+            self.compare_texts()
 
     # функция установки темной темы
     def set_dark_theme(self):
@@ -430,6 +446,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.stopwatch_label.setStyleSheet(f"color: {YELLOW};")
             self.username_label.setStyleSheet(f"color: {YELLOW}")
             self.menubar.setStyleSheet("color: white;")
+            self.compare_texts()
 
     # функция установки океанной темы
     def set_ocean_theme(self):
@@ -445,6 +462,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.stopwatch_label.setStyleSheet(f"color: {OCEAN_YELLOW};")
             self.username_label.setStyleSheet(f"color: {OCEAN_YELLOW}")
             self.menubar.setStyleSheet("color: white;")
+            self.compare_texts()
 
     # функция установки сиреневой темы
     def set_pastel_theme(self):
@@ -460,6 +478,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.stopwatch_label.setStyleSheet(f"color: {PASTEL_BLUE};")
             self.username_label.setStyleSheet(f"color: {PASTEL_BLUE}")
             self.menubar.setStyleSheet("color: white;")
+            self.compare_texts()
 
     # функция установки фиолетовой темы
     def set_violet_theme(self):
@@ -475,6 +494,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.stopwatch_label.setStyleSheet(f"color: {YELLOW};")
             self.username_label.setStyleSheet(f"color: {YELLOW}")
             self.menubar.setStyleSheet("color: white;")
+            self.compare_texts()
 
     # функция установки лесной темы
     def set_forest_theme(self):
@@ -490,6 +510,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.stopwatch_label.setStyleSheet(f"color: {FOREST_BROWN};")
             self.username_label.setStyleSheet(f"color: {FOREST_BROWN}")
             self.menubar.setStyleSheet("color: white;")
+            self.compare_texts()
 
     # функция установки гламурной темы
     def set_glamour_theme(self):
@@ -503,6 +524,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.stopwatch_label.setStyleSheet(f"color: white;")
             self.username_label.setStyleSheet(f"color: white")
             self.menubar.setStyleSheet("color: white;")
+            self.compare_texts()
 
     # функция изменения сложности
     def change_difficulty(self, diff):
@@ -569,23 +591,62 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 class ResultsDialog(QDialog, Ui_Dialog):
     def __init__(self, time, result, theme):
         super().__init__()  # конструктор родительского класса
-        # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
+        # Вызываем метод для загрузки интерфейса из класса Ui_Dialog,
         self.setupUi(self)
+        self.change_theme(theme)
         self.button_box.accepted.connect(self.accept_data)  # привязка функции кнопки ОК
-
         self.time_label.setText(f"Общее время: {time}")
         self.cpm_label.setText(f"Символов в минуту: {result:.{1}f}")
-        # num = randint(1, 5)  # получение рандомного номера картинки
-        # pixmap = QPixmap(f"data\\image_{num}")  # получение картинки из data
-        # self.image_label.setPixmap(pixmap)  # вставка картинки в label
-        self.change_theme(theme)
+        img_num = randint(1, 2)
+        if result <= 100:
+            self.comment_label.setText("Постарайтесь лучше!")
+            img = f"data\\very_bad{img_num}.jpeg"
+        if 100 < result <= 200:
+            self.comment_label.setText("Для начала неплохо!")
+            img = f"data\\bad{img_num}.jpeg"
+        if 200 < result <= 350:
+            self.comment_label.setText("Отличний результат!")
+            img = f"data\\good{img_num}.jpeg"
+        else:
+            self.comment_label.setText("Превосходно!")
+            img = f"data\\very_good{img_num}.jpeg"
+        pixmap = QPixmap(img)
+        pixmap = pixmap.scaled(191, 191)
+        self.image_label.setPixmap(pixmap)  # вставка картинки в label
+        self.show()
+        self.exec()
 
     # функция для закрытия окна на нажатие ОК
     def accept_data(self):
         self.close()
 
     def change_theme(self, theme):
-        pass
+        bg_color, text_color = None, None  # переменные для цветов фона и текста
+        # установка цветов для каждой темы
+        if theme == "dark":
+            bg_color = GRAY1
+            text_color = YELLOW
+        elif theme == "light":
+            bg_color = "white"
+            text_color = BLUE
+        elif theme == "ocean":
+            bg_color = OCEAN_BLUE
+            text_color = OCEAN_YELLOW
+        elif theme == "pastel":
+            bg_color = PASTEL_PURPLE
+            text_color = PASTEL_BLUE
+        elif theme == "violet":
+            bg_color = PURPLE
+            text_color = YELLOW
+        elif theme == "forest":
+            bg_color = FOREST_GREEN
+            text_color = FOREST_BROWN
+        elif theme == "glamour":
+            bg_color = GLAMOUR_PINK
+            text_color = "white"
+        # установка стилей для окна
+        self.setStyleSheet(f"""background-color: {bg_color};
+                               color: {text_color}""")
 
 
 if __name__ == '__main__':
@@ -595,8 +656,5 @@ if __name__ == '__main__':
     ex = MyWidget()
     # показ экземпляра
     ex.show()
-
-    a = RecordingsWindow('Гость', 'dark')
-    a.show()
     # при завершение исполнения QApplication завершить программу
     sys.exit(app.exec())

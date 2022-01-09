@@ -55,47 +55,6 @@ FOREST_LIGHT_GREEN = "#ebffb4"
 FOREST_RED = "#d03739"
 
 
-# конвертирование sql запроса в csv файл
-def convert_sql_to_csv(name, request):  # в функцию передаем имя файла и сам запрос
-    # связываемся с базой данных trainer_db.db
-    con = sqlite3.connect(DATABASE)
-
-    # Создание курсора
-    cur = con.cursor()
-
-    # Выполнение запроса и получение всех результатов
-    data = cur.execute(request).fetchall()
-
-    # ключи csv файла
-    titles = [description[0] for description in cur.description]
-
-    with open(name, 'w+', newline='') as csv_file:  # открываем файл, если он есть, а иначе создаем его
-        writer = csv.DictWriter(
-            csv_file, fieldnames=titles,
-            delimiter=';', quoting=csv.QUOTE_NONNUMERIC)  # объект для записи (writer)
-        writer.writeheader()  # пишем заголовок titles
-        # запись в csv файл
-        for d in data:
-            writer.writerow({titles[i]: d[i] for i in range(len(titles))})
-
-
-# конвертирование sql запроса в csv файл
-def convert_sql_to_txt(name, request):  # в функцию передаем имя файла и сам запрос
-    # связываемся с базой данных trainer_db.db
-    con = sqlite3.connect(DATABASE)
-
-    # Создание курсора
-    cur = con.cursor()
-
-    # Выполнение запроса и получение всех результатов
-    data = cur.execute(request).fetchall()
-
-    with open(name, 'w+') as txt_file:  # открываем файл, если он есть, а иначе создаем его
-        for elem in data:
-            txt_file.write(' '.join(elem))
-            txt_file.write('\n')
-
-
 class RecordingsWindow(QWidget, Ui_Form):
     def __init__(self, user, theme):
         super().__init__()  # конструктор родительского класса
@@ -106,11 +65,12 @@ class RecordingsWindow(QWidget, Ui_Form):
         self.user = user
 
         self.change_theme(theme)  # устанавливаем тему
-        self.username_labe.setText(user)  # устанавливаем пользователя
-        self.load_table(user)  # заргужаем таблицу
+        self.username_labe.setText(self.user)  # устанавливаем пользователя
+        self.load_table()  # заргужаем таблицу
         self.delete_btn.clicked.connect(self.delete_elem)
+        self.pushButton.clicked.connect(self.show_dialog)
 
-    def load_table(self, user):
+    def load_table(self):
         # столбцы таблицы
         keys = ['record_id', 'user', 'data', 'text', 'difficulty', 'time', 'typing_speed']
         columns = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
@@ -122,7 +82,7 @@ class RecordingsWindow(QWidget, Ui_Form):
         result = cur.execute(f"""
         SELECT {', '.join(columns)} FROM Recordings
             WHERE user_id=(
-        SELECT user_id FROM Users WHERE nickname='{user}')
+        SELECT user_id FROM Users WHERE nickname='{self.user}')
         """).fetchall()
 
         # устанавливаем имена столбцов и количество рядов, столбцов
@@ -135,7 +95,7 @@ class RecordingsWindow(QWidget, Ui_Form):
             for j, col in enumerate(row):
                 # подменяем элемент с id на его значение
                 if columns[j] == 'user_id':
-                    col = user
+                    col = self.user
                 elif columns[j] == 'text_id':
                     que = f"""
                     SELECT text FROM Texts
@@ -171,11 +131,67 @@ class RecordingsWindow(QWidget, Ui_Form):
             cur.execute("DELETE FROM Recordings WHERE record_id IN (" + ", ".join(
                 '?' * len(ids)) + ")", ids)
             self.con.commit()
-        self.load_table(self.user)
+        self.load_table()
 
     # функция смены темы
     def change_theme(self, theme):
         pass
+
+    def show_dialog(self):
+        # вызов диалогового окна
+        filename, ok_pressed = QInputDialog.getText(self, "Регистрация", "Введите имя файла:")
+        # если пользователь нажал на ОК, то конвертируем результат в csv файл
+        if ok_pressed:
+            self.convert_to_csv(filename)
+
+    # функция конвертирования в csv файл
+    def convert_to_csv(self, filename):  # в функцию передаем имя файла
+        # столбцы таблиц
+        columns = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
+
+        # Создание курсора
+        cur = self.con.cursor()
+
+        # получаем данные из бд путем запроса
+        result = cur.execute(f"""
+            SELECT {', '.join(columns)} FROM Recordings
+                WHERE user_id=(
+            SELECT user_id FROM Users WHERE nickname='{self.user}')""").fetchall()
+
+        titles = ['record_id', 'user', 'data', 'text', 'mode', 'time', 'typing_speed']
+
+        with open(filename, 'w+', newline='') as csv_file:  # открываем файл, если он есть, а иначе создаем его
+            writer = csv.DictWriter(
+                csv_file, fieldnames=titles,
+                delimiter=';', quoting=csv.QUOTE_NONNUMERIC)  # объект для записи (writer)
+            writer.writeheader()  # пишем заголовок titles
+            # запись в csv файл
+            for elem in result:
+                # создаем словарь
+                dictionary = {}
+                for j, value in enumerate(elem):
+                    key = titles[j]
+                    # подменяем элемент с id на его значение
+                    if columns[j] == 'user_id':
+                        value = self.user
+                    elif columns[j] == 'text_id':
+                        que = f"""
+                            SELECT text FROM Texts
+                                WHERE text_id={value}"""
+
+                        value = cur.execute(que).fetchall()[0][0]
+
+                    elif columns[j] == 'difficulty_id':
+                        que = f"""
+                            SELECT mode FROM Difficults
+                                WHERE difficulty_id={value}"""
+
+                        value = cur.execute(que).fetchall()[0][0]
+
+                    # присваеваем значение к ключу
+                    dictionary[key] = value
+
+                writer.writerow(dictionary)
 
 
 # Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом
@@ -216,12 +232,13 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     # обработчик событий нажатия клавиш и мыши
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:  # при нажатие на esc начать заново
-            self.load_text(self.difficulty_mode)
+            self.start_again()
 
     # начать заново ввод текста
     def start_again(self):
         self.is_program_change = True  # программа изменила текст
         self.reset_stopwatch()  # перезапустить секундомер
+        self.load_text(self.difficulty_mode)
         self.entered_text.setText("")  # обнулить вводимый текст
         self.is_program_change = False  # вернуться к исходному значению
 
@@ -243,9 +260,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         while self.generated_text.text() == text:
             text = choice(texts)[0]
         self.generated_text.setText(text)  # вставить новой текст в generated_text
-
-        # начать заново, так как текст в generated_text изменился
-        self.start_again()
 
     # обработчик события изменения текста
     def text_changed(self):
@@ -276,6 +290,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.entered_text.setTextCursor(cursor)
         if is_correct and len(entered_text) == len(generated_text):
             self.show_and_load_recording()
+            self.start_again()
 
     def show_and_load_recording(self):
         # Создание курсора
@@ -329,7 +344,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         dialog = ResultsDialog(time, typing_speed, self.theme)
         dialog.show()
         dialog.exec()
-        self.load_text(self.difficulty_mode)
 
     # запуск секундомера
     def start_stopwatch(self):

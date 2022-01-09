@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Просмотр записей</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -26,7 +26,8 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(240, 223, 28);</string>
+    <string notr="true">color: black;
+background-color: white;</string>
    </property>
   </widget>
   <widget class="QLabel" name="username_label">

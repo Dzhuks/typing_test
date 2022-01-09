@@ -18,7 +18,8 @@ class Ui_Form(object):
         Form.setStyleSheet("")
         self.recordings_table = QtWidgets.QTableWidget(Form)
         self.recordings_table.setGeometry(QtCore.QRect(10, 10, 331, 281))
-        self.recordings_table.setStyleSheet("color: rgb(240, 223, 28);")
+        self.recordings_table.setStyleSheet("color: black;\n"
+"background-color: white;")
         self.recordings_table.setObjectName("recordings_table")
         self.recordings_table.setColumnCount(0)
         self.recordings_table.setRowCount(0)
@@ -50,7 +51,7 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
+        Form.setWindowTitle(_translate("Form", "Просмотр записей"))
         self.username_label.setText(_translate("Form", "Пользователь"))
         self.delete_btn.setText(_translate("Form", "Удалить запись"))
         self.convert_btn.setText(_translate("Form", "Конвертировать в csv"))

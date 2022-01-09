@@ -63,7 +63,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        Dialog.setWindowTitle(_translate("Dialog", "Результат"))
         self.comment_label.setText(_translate("Dialog", "Отличный результат!"))
         self.cpm_label.setText(_translate("Dialog", "Символов в минуту: 250"))
         self.time_label.setText(_translate("Dialog", "Общее время:1:20"))

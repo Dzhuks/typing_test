@@ -4,6 +4,7 @@ import sys
 import time
 import csv
 import datetime
+import about
 from random import choice, randint
 from project import Ui_MainWindow
 from res_dialog import Ui_Dialog
@@ -13,6 +14,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QTableWidgetItem
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtGui import QTextCursor, QPixmap
+
 
 # адаптация к экранам с высоким разрешением (HiRes)
 if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
@@ -623,6 +625,83 @@ class ResultsDialog(QDialog, Ui_Dialog):
     # функция для закрытия окна на нажатие ОК
     def accept_data(self):
         self.close()
+
+    def change_theme(self, theme):
+        bg_color, text_color = None, None  # переменные для цветов фона и текста
+        # установка цветов для каждой темы
+        if theme == "dark":
+            bg_color = GRAY1
+            text_color = YELLOW
+        elif theme == "light":
+            bg_color = "white"
+            text_color = BLUE
+        elif theme == "ocean":
+            bg_color = OCEAN_BLUE
+            text_color = OCEAN_YELLOW
+        elif theme == "pastel":
+            bg_color = PASTEL_PURPLE
+            text_color = PASTEL_BLUE
+        elif theme == "violet":
+            bg_color = PURPLE
+            text_color = YELLOW
+        elif theme == "forest":
+            bg_color = FOREST_GREEN
+            text_color = FOREST_BROWN
+        elif theme == "glamour":
+            bg_color = GLAMOUR_PINK
+            text_color = "white"
+        # установка стилей для окна
+        self.setStyleSheet(f"""background-color: {bg_color};
+                               color: {text_color}""")
+
+
+class AboutUsWindow(QWidget, about.Ui_Form):
+    def __init__(self, theme):
+        super().__init__()  # конструктор родительского класса
+        # Вызываем метод для загрузки интерфейса из класса Ui_Form,
+        self.setupUi(self)
+        self.change_theme(theme)
+        self.setWindowTitle("О разработчиках")
+        self.label.setText("""Разработчики этого проекта - участники \"Яндекс.Лицей\", 
+                              ученики ФМН НИШ Хусаинов Марат и Сейдазымов Адиль""")
+
+    def change_theme(self, theme):
+        bg_color, text_color = None, None  # переменные для цветов фона и текста
+        # установка цветов для каждой темы
+        if theme == "dark":
+            bg_color = GRAY1
+            text_color = YELLOW
+        elif theme == "light":
+            bg_color = "white"
+            text_color = BLUE
+        elif theme == "ocean":
+            bg_color = OCEAN_BLUE
+            text_color = OCEAN_YELLOW
+        elif theme == "pastel":
+            bg_color = PASTEL_PURPLE
+            text_color = PASTEL_BLUE
+        elif theme == "violet":
+            bg_color = PURPLE
+            text_color = YELLOW
+        elif theme == "forest":
+            bg_color = FOREST_GREEN
+            text_color = FOREST_BROWN
+        elif theme == "glamour":
+            bg_color = GLAMOUR_PINK
+            text_color = "white"
+        # установка стилей для окна
+        self.setStyleSheet(f"""background-color: {bg_color};
+                               color: {text_color}""")
+
+
+class AboutProjectWindow(QWidget, about.Ui_Form):
+    def __init__(self, theme):
+        super().__init__()  # конструктор родительского класса
+        # Вызываем метод для загрузки интерфейса из класса Ui_Form,
+        self.setupUi(self)
+        self.change_theme(theme)
+        self.setWindowTitle("О проекте")
+        self.label.setText("""""")
 
     def change_theme(self, theme):
         bg_color, text_color = None, None  # переменные для цветов фона и текста

@@ -426,6 +426,18 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         # меню результатов
         self.results_menu.triggered.connect(self.show_recordings)
 
+        # окна о разработчиках и о проекте
+        self.about_us_menu.triggered.connect(self.show_about_us_window)
+        self.about_project_menu.triggered.connect(self.show_about_project_window)
+
+    def show_about_us_window(self):
+        self.about_us_window = AboutUsWindow(self.theme)
+        self.about_us_window.show()
+
+    def show_about_project_window(self):
+        self.about_project_window = AboutProjectWindow(self.theme)
+        self.about_project_window.show()
+
     def show_recordings(self):
         self.rec_win = RecordingsWindow(self.user, self.theme)
         self.rec_win.show()

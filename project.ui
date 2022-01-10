@@ -208,13 +208,19 @@ p, li { white-space: pre-wrap; }
     <addaction name="user_setting"/>
     <addaction name="results_menu"/>
    </widget>
-   <widget class="QMenu" name="about_menu">
+   <widget class="QMenu" name="about_us_menu">
     <property name="title">
      <string>О разработчиках</string>
     </property>
    </widget>
+   <widget class="QMenu" name="about_project_menu">
+    <property name="title">
+     <string>О проекте</string>
+    </property>
+   </widget>
    <addaction name="settings_menu"/>
-   <addaction name="about_menu"/>
+   <addaction name="about_us_menu"/>
+   <addaction name="about_project_menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="enabled">

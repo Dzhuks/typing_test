@@ -26,12 +26,15 @@ if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
 # константы
 DATABASE = "data\\trainer_db.db"
 
-GREEN = '#49DC01'
-RED = '#DC143C'
-GRAY1 = "#383838"
-GRAY2 = "#7a7a7a"
+WHITE = "#ffffff"
+BLACK = "#000000"
 YELLOW = "#f0df1c"
 BLUE = "#0e46ff"
+GREEN = '#49DC01'
+RED = '#DC143C'
+
+GRAY1 = "#383838"
+GRAY2 = "#7a7a7a"
 
 OCEAN_GREEN = "#6fffeb"
 OCEAN_BLUE = "#304cff"
@@ -54,6 +57,10 @@ FOREST_GREEN = "#6caa33"
 FOREST_BROWN = "#81593e"
 FOREST_LIGHT_GREEN = "#ebffb4"
 FOREST_RED = "#d03739"
+
+THEMES = {"dark": (GRAY1, YELLOW), "light": (WHITE, BLUE), "ocean": (OCEAN_BLUE, OCEAN_YELLOW),
+          "pastel": (PASTEL_PURPLE, PASTEL_BLUE), "violet": (PURPLE, YELLOW),
+          "forest": (FOREST_GREEN, FOREST_BROWN), "glamour": (GLAMOUR_PINK, WHITE)}
 
 
 class RecordingsWindow(QWidget, Ui_Form):
@@ -135,32 +142,16 @@ class RecordingsWindow(QWidget, Ui_Form):
 
     # функция смены темы
     def change_theme(self, theme):
-        bg_color, text_color = None, None  # переменные для цветов фона и текста
-        # установка цветов для каждой темы
-        if theme == "dark":
-            bg_color = GRAY1
-            text_color = YELLOW
-        elif theme == "light":
-            bg_color = "white"
-            text_color = BLUE
-        elif theme == "ocean":
-            bg_color = OCEAN_BLUE
-            text_color = OCEAN_YELLOW
-        elif theme == "pastel":
-            bg_color = PASTEL_PURPLE
-            text_color = PASTEL_BLUE
-        elif theme == "violet":
-            bg_color = PURPLE
-            text_color = YELLOW
-        elif theme == "forest":
-            bg_color = FOREST_GREEN
-            text_color = FOREST_BROWN
-        elif theme == "glamour":
-            bg_color = GLAMOUR_PINK
-            text_color = "white"
-        # установка стилей для окна
-        self.setStyleSheet(f"""background-color: {bg_color};
-                               color: {text_color}""")
+        try:
+            bg_color, text_color = THEMES[theme]
+            self.setStyleSheet(f"""background-color: {bg_color};
+                                           color: {text_color}""")
+        except KeyError:
+            error_message = QMessageBox(self)
+            error_message.setIcon(QMessageBox.Critical)
+            error_message.setText(f"Такой темы {theme} не существует")
+            error_message.setWindowTitle("Смена темы отменена")
+            error_message.exec_()
 
     def show_dialog(self):
         # вызов диалогового окна
@@ -440,107 +431,108 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # функция смены темы приложения
     def change_theme(self, theme):
-        if self.theme != theme:
-            self.theme = theme
-            if theme == "light":
-                self.set_light_theme()
-            if theme == "dark":
-                self.set_dark_theme()
-            if theme == "ocean":
-                self.set_ocean_theme()
-            if theme == "violet":
-                self.set_violet_theme()
-            if theme == "pastel":
-                self.set_pastel_theme()
-            if theme == "forest":
-                self.set_forest_theme()
-            if theme == "glamour":
-                self.set_glamour_theme()
-            self.compare_texts()
+        if self.theme == theme:
+            return
+        self.theme = theme
+        if theme == "light":
+            self.set_light_theme()
+        elif theme == "dark":
+            self.set_dark_theme()
+        elif theme == "ocean":
+            self.set_ocean_theme()
+        elif theme == "violet":
+            self.set_violet_theme()
+        elif theme == "pastel":
+            self.set_pastel_theme()
+        elif theme == "forest":
+            self.set_forest_theme()
+        elif theme == "glamour":
+            self.set_glamour_theme()
+        self.compare_texts()
 
     # функция установки светлой темы
     def set_light_theme(self):
         self.correct_color = GREEN
         self.incorrect_color = RED
-        self.setStyleSheet("color: black")
+        self.setStyleSheet(f"color: {BLACK};")
         self.generated_text.setStyleSheet(f"color: {BLUE};")
         self.entered_text.setStyleSheet(f"color: {GREEN};")
         self.hint_label.setStyleSheet(f"color: {GRAY2};")
         self.stopwatch_label.setStyleSheet(f"color: {BLUE};")
-        self.username_label.setStyleSheet(f"color: {BLUE}")
-        self.menubar.setStyleSheet("color: black;")
+        self.username_label.setStyleSheet(f"color: {BLUE};")
+        self.menubar.setStyleSheet(f"color: {BLACK};")
 
     # функция установки темной темы
     def set_dark_theme(self):
         self.correct_color = GREEN
         self.incorrect_color = RED
-        self.setStyleSheet(f"background-color: {GRAY1}; color: white;")
+        self.setStyleSheet(f"background-color: {GRAY1}; color: {WHITE};")
         self.generated_text.setStyleSheet(f"color: {YELLOW};")
         self.entered_text.setStyleSheet(f"color: {GREEN};")
         self.hint_label.setStyleSheet(f"color: {GRAY2};")
         self.stopwatch_label.setStyleSheet(f"color: {YELLOW};")
         self.username_label.setStyleSheet(f"color: {YELLOW}")
-        self.menubar.setStyleSheet("color: white;")
+        self.menubar.setStyleSheet(f"color: {WHITE};")
 
     # функция установки океанной темы
     def set_ocean_theme(self):
         self.correct_color = OCEAN_GREEN
         self.incorrect_color = OCEAN_RED
-        self.setStyleSheet(f"background-color: {OCEAN_BLUE}; color: white;")
+        self.setStyleSheet(f"background-color: {OCEAN_BLUE}; color: {WHITE};")
         self.generated_text.setStyleSheet(f"color: {OCEAN_YELLOW};")
         self.entered_text.setStyleSheet(f"color: {OCEAN_GREEN};")
         self.hint_label.setStyleSheet(f"color: {GRAY2};")
         self.stopwatch_label.setStyleSheet(f"color: {OCEAN_YELLOW};")
         self.username_label.setStyleSheet(f"color: {OCEAN_YELLOW}")
-        self.menubar.setStyleSheet("color: white;")
+        self.menubar.setStyleSheet(f"color: {WHITE};")
 
     # функция установки сиреневой темы
     def set_pastel_theme(self):
         self.correct_color = PASTEL_GREEN
         self.incorrect_color = PASTEL_RED
-        self.setStyleSheet(f"background-color: {PASTEL_PURPLE}; color: white;")
+        self.setStyleSheet(f"background-color: {PASTEL_PURPLE}; color: {WHITE};")
         self.generated_text.setStyleSheet(f"color: {PASTEL_BLUE};")
         self.entered_text.setStyleSheet(f"color: {PASTEL_GREEN};")
         self.hint_label.setStyleSheet(f"color: {GRAY2};")
         self.stopwatch_label.setStyleSheet(f"color: {PASTEL_BLUE};")
         self.username_label.setStyleSheet(f"color: {PASTEL_BLUE}")
-        self.menubar.setStyleSheet("color: white;")
+        self.menubar.setStyleSheet(f"color: {WHITE};")
 
     # функция установки фиолетовой темы
     def set_violet_theme(self):
         self.correct_color = GREEN
         self.incorrect_color = RED
-        self.setStyleSheet(f"background-color: {PURPLE}; color: white;")
+        self.setStyleSheet(f"background-color: {PURPLE}; color:{WHITE};")
         self.generated_text.setStyleSheet(f"color: {YELLOW};")
         self.entered_text.setStyleSheet(f"color: {GREEN};")
         self.hint_label.setStyleSheet(f"color: {GRAY2};")
         self.stopwatch_label.setStyleSheet(f"color: {YELLOW};")
         self.username_label.setStyleSheet(f"color: {YELLOW}")
-        self.menubar.setStyleSheet("color: white;")
+        self.menubar.setStyleSheet(f"color: {WHITE};")
 
     # функция установки лесной темы
     def set_forest_theme(self):
         self.correct_color = FOREST_LIGHT_GREEN
         self.incorrect_color = FOREST_RED
-        self.setStyleSheet(f"background-color: {FOREST_GREEN}; color: white;")
+        self.setStyleSheet(f"background-color: {FOREST_GREEN}; color: {WHITE};")
         self.generated_text.setStyleSheet(f"color: {FOREST_BROWN};")
         self.entered_text.setStyleSheet(f"color: {FOREST_LIGHT_GREEN};")
         self.hint_label.setStyleSheet(f"color: {GRAY2};")
         self.stopwatch_label.setStyleSheet(f"color: {FOREST_BROWN};")
         self.username_label.setStyleSheet(f"color: {FOREST_BROWN}")
-        self.menubar.setStyleSheet("color: white;")
+        self.menubar.setStyleSheet(f"color: {WHITE};")
 
     # функция установки гламурной темы
     def set_glamour_theme(self):
         self.correct_color = GLAMOUR_BLUE
         self.incorrect_color = GLAMOUR_RED
-        self.setStyleSheet(f"background-color: {GLAMOUR_PINK}; color: white;")
+        self.setStyleSheet(f"background-color: {GLAMOUR_PINK}; color: {WHITE};")
         self.generated_text.setStyleSheet(f"color: white;")
         self.entered_text.setStyleSheet(f"color: {GLAMOUR_BLUE};")
         self.hint_label.setStyleSheet(f"color: {GLAMOUR_GRAY};")
-        self.stopwatch_label.setStyleSheet(f"color: white;")
-        self.username_label.setStyleSheet(f"color: white")
-        self.menubar.setStyleSheet("color: white;")
+        self.stopwatch_label.setStyleSheet(f"color: {WHITE};")
+        self.username_label.setStyleSheet(f"color: {WHITE}")
+        self.menubar.setStyleSheet(f"color: {WHITE};")
 
     # функция изменения сложности
     def change_difficulty(self, diff):
@@ -645,32 +637,16 @@ class ResultsDialog(QDialog, Ui_Dialog):
         self.close()
 
     def change_theme(self, theme):
-        bg_color, text_color = None, None  # переменные для цветов фона и текста
-        # установка цветов для каждой темы
-        if theme == "dark":
-            bg_color = GRAY1
-            text_color = YELLOW
-        elif theme == "light":
-            bg_color = "white"
-            text_color = BLUE
-        elif theme == "ocean":
-            bg_color = OCEAN_BLUE
-            text_color = OCEAN_YELLOW
-        elif theme == "pastel":
-            bg_color = PASTEL_PURPLE
-            text_color = PASTEL_BLUE
-        elif theme == "violet":
-            bg_color = PURPLE
-            text_color = YELLOW
-        elif theme == "forest":
-            bg_color = FOREST_GREEN
-            text_color = FOREST_BROWN
-        elif theme == "glamour":
-            bg_color = GLAMOUR_PINK
-            text_color = "white"
-        # установка стилей для окна
-        self.setStyleSheet(f"""background-color: {bg_color};
-                               color: {text_color}""")
+        try:
+            bg_color, text_color = THEMES[theme]
+            self.setStyleSheet(f"""background-color: {bg_color};
+                                           color: {text_color}""")
+        except KeyError:
+            error_message = QMessageBox(self)
+            error_message.setIcon(QMessageBox.Critical)
+            error_message.setText(f"Такой темы {theme} не существует")
+            error_message.setWindowTitle("Смена темы отменена")
+            error_message.exec_()
 
 
 class AboutUsWindow(QWidget, about.Ui_Form):
@@ -684,32 +660,16 @@ class AboutUsWindow(QWidget, about.Ui_Form):
 ученики 9 класса ФМН НИШ Хусаинов Марат и Сейдазымов Адиль""")
 
     def change_theme(self, theme):
-        bg_color, text_color = None, None  # переменные для цветов фона и текста
-        # установка цветов для каждой темы
-        if theme == "dark":
-            bg_color = GRAY1
-            text_color = YELLOW
-        elif theme == "light":
-            bg_color = "white"
-            text_color = BLUE
-        elif theme == "ocean":
-            bg_color = OCEAN_BLUE
-            text_color = OCEAN_YELLOW
-        elif theme == "pastel":
-            bg_color = PASTEL_PURPLE
-            text_color = PASTEL_BLUE
-        elif theme == "violet":
-            bg_color = PURPLE
-            text_color = YELLOW
-        elif theme == "forest":
-            bg_color = FOREST_GREEN
-            text_color = FOREST_BROWN
-        elif theme == "glamour":
-            bg_color = GLAMOUR_PINK
-            text_color = "white"
-        # установка стилей для окна
-        self.setStyleSheet(f"""background-color: {bg_color};
-                               color: {text_color}""")
+        try:
+            bg_color, text_color = THEMES[theme]
+            self.setStyleSheet(f"""background-color: {bg_color};
+                                           color: {text_color}""")
+        except KeyError:
+            error_message = QMessageBox(self)
+            error_message.setIcon(QMessageBox.Critical)
+            error_message.setText(f"Такой темы {theme} не существует")
+            error_message.setWindowTitle("Смена темы отменена")
+            error_message.exec_()
 
 
 class AboutProjectWindow(QWidget, about.Ui_Form):
@@ -722,32 +682,16 @@ class AboutProjectWindow(QWidget, about.Ui_Form):
         self.label.setText("""""")
 
     def change_theme(self, theme):
-        bg_color, text_color = None, None  # переменные для цветов фона и текста
-        # установка цветов для каждой темы
-        if theme == "dark":
-            bg_color = GRAY1
-            text_color = YELLOW
-        elif theme == "light":
-            bg_color = "white"
-            text_color = BLUE
-        elif theme == "ocean":
-            bg_color = OCEAN_BLUE
-            text_color = OCEAN_YELLOW
-        elif theme == "pastel":
-            bg_color = PASTEL_PURPLE
-            text_color = PASTEL_BLUE
-        elif theme == "violet":
-            bg_color = PURPLE
-            text_color = YELLOW
-        elif theme == "forest":
-            bg_color = FOREST_GREEN
-            text_color = FOREST_BROWN
-        elif theme == "glamour":
-            bg_color = GLAMOUR_PINK
-            text_color = "white"
-        # установка стилей для окна
-        self.setStyleSheet(f"""background-color: {bg_color};
-                               color: {text_color}""")
+        try:
+            bg_color, text_color = THEMES[theme]
+            self.setStyleSheet(f"""background-color: {bg_color};
+                                           color: {text_color}""")
+        except KeyError:
+            error_message = QMessageBox(self)
+            error_message.setIcon(QMessageBox.Critical)
+            error_message.setText(f"Такой темы {theme} не существует")
+            error_message.setWindowTitle("Смена темы отменена")
+            error_message.exec_()
 
 
 if __name__ == '__main__':

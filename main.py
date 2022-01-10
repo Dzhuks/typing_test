@@ -69,10 +69,10 @@ class RecordingsWindow(QWidget, Ui_Form):
         self.columns = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
 
         self.change_theme(theme)  # устанавливаем тему
-        self.username_labe.setText(self.user)  # устанавливаем пользователя
+        self.username_label.setText(self.user)  # устанавливаем пользователя
         self.load_table()  # заргужаем таблицу
         self.delete_btn.clicked.connect(self.delete_elem)
-        self.pushButton.clicked.connect(self.show_dialog)
+        self.convert_btn.clicked.connect(self.show_dialog)
 
     def load_table(self):
         # Создание курсора
@@ -230,7 +230,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.con = sqlite3.connect(DATABASE)
 
         self.difficulty_mode = 'easy'  # легкий режим по умолчанию
-        self.load_users()
         self.user = "Гость"  # пользователь по умолчанию
 
         self.theme = "dark"  # тема по умолчанию
@@ -399,28 +398,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             stopwatch = '0' * (2 - len(minutes)) + minutes + ':' + '0' * (2 - len(seconds)) + seconds
             self.stopwatch_label.setText(stopwatch)
 
-    # загрузка пользователей из базы данных в словарь
-    def load_users(self):
-        # Создание курсора
-        cur = self.con.cursor()
-
-        # Выполнение запроса и получение всех результатов
-        users = cur.execute("""SELECT user_id, nickname FROM Users""").fetchall()
-
-        users = ()
-        # Выполнение запроса и получение всех результатов
-        try:  # пытаемся получить данные из соединения
-            users = cur.execute("""SELECT user_id, nickname FROM Users""").fetchall()
-        except sqlite3.OperationalError:  # если база данных отсутствует
-            error_message = QMessageBox(self)  # создаем окно с сообщением об ошибке
-            error_message.setIcon(QMessageBox.Critical)
-            error_message.setText("Отсутствует база данных!")
-            error_message.setInformativeText("Проверьте целостность программы")
-            error_message.setWindowTitle("Ошибка загрузки")
-            error_message.exec_()
-            self.close()  # закрываем окно
-            exit()  # досрочно выходим из программы
-
     # функция для привязки частей интерфейса к функциям
     def interface_binding(self):
         # настройки темы
@@ -569,6 +546,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def change_difficulty(self, diff):
         # если сложность не осталось такой же, то поменять текст в generated_text со сложностью diff
         if self.difficulty_mode != diff:
+            self.difficulty_mode = diff
             self.start_again()
         # изменить сложность
         self.difficulty_mode = diff
@@ -580,28 +558,33 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
         # если пользователь нажал на ОК, то добавить его в таблицу Users в БД
         if ok_pressed:
-            # если пользователь уже существует, то вызвать окно с ошибкой
-            cur = self.con.cursor()
-            users = map(lambda x: x[0], cur.execute("""SELECT nickname FROM Users""").fetchall())
-            if username in users:
-                error_message = QMessageBox(self)
-                error_message.setIcon(QMessageBox.Critical)
-                error_message.setText("Пользователь уже существует!")
-                error_message.setInformativeText("Введите другое имя пользователя")
-                error_message.setWindowTitle("Регистрация отменена")
-                error_message.exec_()
-                return
+            self.add_user(username)
+            self.start_again()
 
-            # поменять пользователя
-            self.user = username
-            # изменить ник отображаемый в окне
-            self.username_label.setText(username)
+    # загрузка пользователя в БД
+    def add_user(self, username):
+        cur = self.con.cursor()
+        users = map(lambda x: x[0], cur.execute("""SELECT nickname FROM Users""").fetchall())
+        # если пользователь уже существует, то вызвать окно с ошибкой
+        if username in users:
+            error_message = QMessageBox(self)
+            error_message.setIcon(QMessageBox.Critical)
+            error_message.setText("Пользователь уже существует!")
+            error_message.setInformativeText("Введите другое имя пользователя")
+            error_message.setWindowTitle("Регистрация отменена")
+            error_message.exec_()
+            return
 
-            # добавляем пользователя в таблицу Users из БД
-            cur.execute(f"INSERT INTO Users(nickname) VALUES('{username}')")
+        # поменять пользователя
+        self.user = username
+        # изменить ник отображаемый в окне
+        self.username_label.setText(username)
 
-            # зафиксировать изменения в БД
-            self.con.commit()
+        # добавляем пользователя в таблицу Users из БД
+        cur.execute(f"INSERT INTO Users(nickname) VALUES('{username}')")
+
+        # зафиксировать изменения в БД
+        self.con.commit()
 
     # функция для входа в пользователя
     def login(self):
@@ -611,12 +594,13 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         users = map(lambda x: x[0], cur.execute("""SELECT nickname FROM Users""").fetchall())
 
         username, ok_pressed = QInputDialog.getItem(self, "Вход", "Выберите пользователя: ",
-                                                    users_id, 1, False)
+                                                    users, 1, False)
         # если пользователь нажал на ОК, то сменить пользователя
         if ok_pressed:
             self.user = username  # смена пользователя
             # изменить ник отображаемый в окне
             self.username_label.setText(username)
+            self.start_again()
 
     # функция, которая вызывается, когда закрывается окно
     def closeEvent(self, *args, **kwargs):
@@ -634,21 +618,27 @@ class ResultsDialog(QDialog, Ui_Dialog):
         self.time_label.setText(f"Общее время: {time}")
         self.cpm_label.setText(f"Символов в минуту: {result:.{1}f}")
         img_num = randint(1, 2)
-        if result <= 100:
-            self.comment_label.setText("Постарайтесь лучше!")
-            img = f"data\\very_bad{img_num}.jpeg"
-        if 100 < result <= 200:
-            self.comment_label.setText("Для начала неплохо!")
-            img = f"data\\bad{img_num}.jpeg"
-        if 200 < result <= 350:
-            self.comment_label.setText("Отличный результат!")
-            img = f"data\\good{img_num}.jpeg"
-        else:
-            self.comment_label.setText("Превосходно!")
-            img = f"data\\very_good{img_num}.jpeg"
-        pixmap = QPixmap(img)
-        pixmap = pixmap.scaled(191, 191)
-        self.image_label.setPixmap(pixmap)  # вставка картинки в label
+        try:
+            if result <= 100:
+                self.comment_label.setText("Постарайтесь лучше!")
+                img = f"data\\very_bad{img_num}.jpeg"
+            elif 100 < result <= 200:
+                self.comment_label.setText("Для начала неплохо!")
+                img = f"data\\bad{img_num}.jpeg"
+            elif 200 < result <= 350:
+                self.comment_label.setText("Отличный результат!")
+                img = f"data\\good{img_num}.jpeg"
+            else:
+                self.comment_label.setText("Превосходно!")
+                img = f"data\\very_good{img_num}.jpeg"
+            pixmap = QPixmap(img)
+            pixmap = pixmap.scaled(191, 191)
+            self.image_label.setPixmap(pixmap)  # вставка картинки в label
+        except Exception:
+            error_message = QMessageBox(self)
+            error_message.setIcon(QMessageBox.Critical)
+            error_message.setText("Картинка не найдена!")
+            error_message.exec_()
 
     # функция для закрытия окна на нажатие ОК
     def accept_data(self):

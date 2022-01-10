@@ -208,19 +208,15 @@ p, li { white-space: pre-wrap; }
     <addaction name="user_setting"/>
     <addaction name="results_menu"/>
    </widget>
-   <widget class="QMenu" name="about_us_menu">
+   <widget class="QMenu" name="about_menu">
     <property name="title">
-     <string>О разработчиках</string>
+     <string>Инфо</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="about_project_menu">
-    <property name="title">
-     <string>О проекте</string>
-    </property>
+    <addaction name="about_us"/>
+    <addaction name="about_project"/>
    </widget>
    <addaction name="settings_menu"/>
-   <addaction name="about_us_menu"/>
-   <addaction name="about_project_menu"/>
+   <addaction name="about_menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="enabled">
@@ -306,6 +302,16 @@ p, li { white-space: pre-wrap; }
   <action name="glamour_theme">
    <property name="text">
     <string>Гламур</string>
+   </property>
+  </action>
+  <action name="about_us">
+   <property name="text">
+    <string>О разработчиках</string>
+   </property>
+  </action>
+  <action name="about_project">
+   <property name="text">
+    <string>О проекте</string>
    </property>
   </action>
  </widget>

@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Клавиатурный тренажер</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(56, 56, 56);
@@ -27,7 +30,7 @@ color: white;</string>
       <height>501</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,3">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="3,1,3">
      <property name="sizeConstraint">
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
@@ -213,7 +216,22 @@ p, li { white-space: pre-wrap; }
    <addaction name="settings_menu"/>
    <addaction name="about_menu"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+  </widget>
   <action name="dark_theme">
    <property name="text">
     <string>Темная (по умолчанию)</string>

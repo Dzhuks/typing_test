@@ -14,6 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
+        MainWindow.setEnabled(True)
         MainWindow.resize(800, 600)
         MainWindow.setStyleSheet("background-color: rgb(56, 56, 56);\n"
 "color: white;")
@@ -59,6 +60,7 @@ class Ui_MainWindow(object):
 "border-color: rgb(255, 255, 0);")
         self.entered_text.setObjectName("entered_text")
         self.verticalLayout.addWidget(self.entered_text)
+        self.verticalLayout.setStretch(0, 3)
         self.verticalLayout.setStretch(1, 1)
         self.verticalLayout.setStretch(2, 3)
         self.stopwatch_label = QtWidgets.QLabel(self.centralwidget)
@@ -95,6 +97,12 @@ class Ui_MainWindow(object):
         self.about_menu.setObjectName("about_menu")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setEnabled(True)
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.statusbar.setFont(font)
+        self.statusbar.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.statusbar.setStyleSheet("")
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.dark_theme = QtWidgets.QAction(MainWindow)
@@ -150,7 +158,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Клавиатурный тренажер"))
         self.hint_label.setText(_translate("MainWindow", "Нажмите Esc чтобы начать заново"))
         self.entered_text.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"

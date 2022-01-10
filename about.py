@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'about_us.ui'
+# Form implementation generated from reading ui file 'about.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -17,9 +17,8 @@ class Ui_Form(object):
         Form.resize(541, 422)
         self.label = QtWidgets.QLabel(Form)
         self.label.setGeometry(QtCore.QRect(10, 10, 511, 391))
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        self.label.setFont(font)
+        self.label.setLocale(QtCore.QLocale(QtCore.QLocale.Russian, QtCore.QLocale.Russia))
+        self.label.setText("")
         self.label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label.setObjectName("label")
 
@@ -28,5 +27,4 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "О разработчиках"))
-        self.label.setText(_translate("Form", "вылфдвоыфд"))
+        Form.setWindowTitle(_translate("Form", "Form"))

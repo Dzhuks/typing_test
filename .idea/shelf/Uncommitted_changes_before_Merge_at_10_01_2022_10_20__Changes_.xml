@@ -1,0 +1,9 @@
+<changelist name="Uncommitted_changes_before_Merge_at_10_01_2022_10_20_[Changes]" date="1641800130164" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Merge_at_10_01_2022_10_20_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Merge at 10.01.2022 10:20 [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="data/trainer_db.db" />
+    <option name="AFTER_PATH" value="data/trainer_db.db" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Merge_at_10_01_2022_10_20_[Changes]/trainer_db.db" />
+  </binary>
+</changelist>

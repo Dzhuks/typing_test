@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="95e1e91d-7452-4b12-a10e-bcb3539e57a7" name="Changes" comment="Clean database" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="origin/Marat" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/README.md" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectId" id="22yHks2Ic1q8OihbHNDB1kgUKAr" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Project/Yandex_second_course" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+  </component>
+  <component name="ReaderModeSettings">
+    <option name="enabled" value="false" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Python\pythonProject\typing_test\data" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\a-kst\anaconda3\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="95e1e91d-7452-4b12-a10e-bcb3539e57a7" name="Changes" comment="" />
+      <created>1640803052606</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1640803052606</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Change the database and move files to data.">
+      <created>1640804288872</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1640804288872</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Add timer function">
+      <created>1640811504410</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1640811504411</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Merge Adil and Marat">
+      <created>1640867382558</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1640867382558</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Add load text function and improve timer.">
+      <created>1640873391952</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1640873391952</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Processing of high-resolution screens (HiRes)">
+      <created>1640946967471</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1640946967472</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Updating the stopwatch, calling the signal, adding comments">
+      <created>1640952168416</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1640952168416</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Add compare_texts function and fixed problem with cursor when it called.">
+      <created>1641116777708</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1641116777708</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Add stub function show_result calling when user enter all right">
+      <created>1641116994198</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1641116994198</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Fixed compare_texts function">
+      <created>1641117107300</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1641117107300</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Add convert_sql_to_csv and convert_sql_to_txt functions. Also fixed typo is_programme_change -&gt; is_progremm_change">
+      <created>1641122863016</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1641122863016</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Merge Adil and Marat branches">
+      <created>1641123666030</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1641123666030</updated>
+    </task>
+    <task id="LOCAL-00012" summary="ResultsDialog work">
+      <created>1641139200858</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1641139200858</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Change convert_sql_to_txt and convert_sql_to_csv functions">
+      <created>1641217221041</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1641217221041</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Merge Adil and Marat branches">
+      <created>1641217787826</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1641217787826</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Fixed convert_sql_to_txt function">
+      <created>1641218274198</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1641218274198</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Add show_and_load_recording, modify self.time_r">
+      <created>1641322572014</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1641322572014</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Add create_item function to create table_widget_item with flags">
+      <created>1641395834606</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1641395834606</updated>
+    </task>
+    <task id="LOCAL-00018" summary="RecordingWindow class has released half">
+      <created>1641401578303</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1641401578303</updated>
+    </task>
+    <task id="LOCAL-00019" summary="RecordingWindow class has released half and add comments">
+      <created>1641402170663</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1641402170663</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Fix convert_sql_to_txt, convert_sql_to_csv, load_table">
+      <created>1641478887307</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1641478887307</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Fix convert_sql_to_txt, convert_sql_to_csv, load_table">
+      <created>1641479786383</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1641479786383</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Some changes">
+      <created>1641543043115</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1641543043115</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Add delete_elem function">
+      <created>1641629682258</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1641629682258</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Fixed login and registration function">
+      <created>1641632860427</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1641632860427</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Merge Adil and Marat">
+      <created>1641634360090</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1641634360090</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Move convert_to_csv function into RecordingsWindow class and delete convert_sql_to_txt function">
+      <created>1641738897727</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1641738897727</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Change data in Recordings. Now it char. So I change code in data = str(datetime.datetime.now().date())">
+      <created>1641751909468</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1641751909468</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Fixed stupid code">
+      <created>1641801873464</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1641801873464</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Fixed change_theme. Add THEME constant">
+      <created>1641803085038</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1641803085038</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Final project">
+      <created>1641806514496</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1641806514496</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Clean database">
+      <created>1641806642395</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1641806642395</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="Space.CommitStatus" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/Marat" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/Adil" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="HEAD" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Processing of high-resolution screens (HiRes)" />
+    <MESSAGE value="Updating the stopwatch, calling the signal, adding comments" />
+    <MESSAGE value="Add compare_texts function and fixed problem with cursor when it called." />
+    <MESSAGE value="Add stub function show_result calling when user enter all right" />
+    <MESSAGE value="Fixed compare_texts function" />
+    <MESSAGE value="Add convert_sql_to_csv and convert_sql_to_txt functions. Also fixed typo is_programme_change -&gt; is_progremm_change" />
+    <MESSAGE value="ResultsDialog work" />
+    <MESSAGE value="Change convert_sql_to_txt and convert_sql_to_csv functions" />
+    <MESSAGE value="Merge Adil and Marat branches" />
+    <MESSAGE value="Fixed convert_sql_to_txt function" />
+    <MESSAGE value="Add show_and_load_recording, modify self.time_r" />
+    <MESSAGE value="Add create_item function to create table_widget_item with flags" />
+    <MESSAGE value="RecordingWindow class has released half" />
+    <MESSAGE value="RecordingWindow class has released half and add comments" />
+    <MESSAGE value="Fix convert_sql_to_txt, convert_sql_to_csv, load_table" />
+    <MESSAGE value="Some changes" />
+    <MESSAGE value="Add delete_elem function" />
+    <MESSAGE value="Fixed login and registration function" />
+    <MESSAGE value="Merge Adil and Marat" />
+    <MESSAGE value="Move convert_to_csv function into RecordingsWindow class and delete convert_sql_to_txt function" />
+    <MESSAGE value="Change data in Recordings. Now it char. So I change code in data = str(datetime.datetime.now().date())" />
+    <MESSAGE value="Fixed stupid code" />
+    <MESSAGE value="Fixed change_theme. Add THEME constant" />
+    <MESSAGE value="Final project" />
+    <MESSAGE value="Clean database" />
+    <option name="LAST_COMMIT_MESSAGE" value="Clean database" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

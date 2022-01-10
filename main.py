@@ -427,8 +427,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.results_menu.triggered.connect(self.show_recordings)
 
         # окна о разработчиках и о проекте
-        self.about_us_menu.triggered.connect(self.show_about_us_window)
-        self.about_project_menu.triggered.connect(self.show_about_project_window)
+        self.about_us.triggered.connect(self.show_about_us_window)
+        self.about_project.triggered.connect(self.show_about_project_window)
 
     def show_about_us_window(self):
         self.about_us_window = AboutUsWindow(self.theme)
@@ -674,8 +674,8 @@ class AboutUsWindow(QWidget, about.Ui_Form):
         self.setupUi(self)
         self.change_theme(theme)
         self.setWindowTitle("О разработчиках")
-        self.label.setText("""Разработчики этого проекта - участники \"Яндекс.Лицей\", 
-                              ученики ФМН НИШ Хусаинов Марат и Сейдазымов Адиль""")
+        self.label.setText("""Разработчики этого проекта - участники \"Яндекс.Лицей\", \
+ученики 9 класса ФМН НИШ Хусаинов Марат и Сейдазымов Адиль""")
 
     def change_theme(self, theme):
         bg_color, text_color = None, None  # переменные для цветов фона и текста

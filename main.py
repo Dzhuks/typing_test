@@ -69,15 +69,20 @@ class RecordingsWindow(QWidget, Ui_Form):
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         self.setupUi(self)
 
+        # связываемся с БД
         self.con = sqlite3.connect(DATABASE)
+
         self.user = user
 
+        # столбцы в БД и заголовки для отображаемой таблицы
         self.titles = ['record_id', 'user', 'data', 'text', 'mode', 'time', 'typing_speed']
         self.columns = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
 
         self.change_theme(theme)  # устанавливаем тему
         self.username_label.setText(self.user)  # устанавливаем пользователя
         self.load_table()  # заргужаем таблицу
+
+        # связываем кнопки с функциями
         self.delete_btn.clicked.connect(self.delete_elem)
         self.convert_btn.clicked.connect(self.show_dialog)
 
@@ -124,6 +129,16 @@ class RecordingsWindow(QWidget, Ui_Form):
         self.recordings_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
     def delete_elem(self):
+        # если пользователь ничего не выбрал, то вызвать ошибку
+        if len(self.recordings_table.selectedItems()) == 0:
+            error_message = QMessageBox(self)
+            error_message.setIcon(QMessageBox.Critical)
+            error_message.setText("Вы ничего не выбрали!")
+            error_message.setInformativeText("Выберите строки для удаления")
+            error_message.setWindowTitle("Удаление заисей отменена")
+            error_message.exec_()
+            return
+
         # Получаем список элементов без повторов и их id
         rows = list(set([i.row() for i in self.recordings_table.selectedItems()]))
         ids = [self.recordings_table.item(i, 0).text() for i in rows]
@@ -134,14 +149,16 @@ class RecordingsWindow(QWidget, Ui_Form):
         # Если пользователь ответил утвердительно, удаляем элементы.
         # Не забываем зафиксировать изменения
         if valid == QMessageBox.Yes:
+            # удаляем записи и сохраняем изменений
             cur = self.con.cursor()
             cur.execute("DELETE FROM Recordings WHERE record_id IN (" + ", ".join(
                 '?' * len(ids)) + ")", ids)
             self.con.commit()
-        self.load_table()
+        self.load_table()  # загружаем таблицу снова
 
     # функция смены темы
     def change_theme(self, theme):
+        # если темы нет, то вызываем сообщение об ошибке
         try:
             bg_color, text_color = THEMES[theme]
             self.setStyleSheet(f"""background-color: {bg_color};
@@ -187,15 +204,15 @@ class RecordingsWindow(QWidget, Ui_Form):
                         value = self.user
                     elif self.columns[j] == 'text_id':
                         que = f"""
-                                    SELECT text FROM Texts
-                                        WHERE text_id={value}"""
+                            SELECT text FROM Texts
+                                WHERE text_id={value}"""
 
                         value = cur.execute(que).fetchall()[0][0]
 
                     elif self.columns[j] == 'difficulty_id':
                         que = f"""
-                                    SELECT mode FROM Difficults
-                                        WHERE difficulty_id={value}"""
+                            SELECT mode FROM Difficults
+                                WHERE difficulty_id={value}"""
 
                         value = cur.execute(que).fetchall()[0][0]
 
@@ -211,7 +228,7 @@ class RecordingsWindow(QWidget, Ui_Form):
 
 
 # Наследуемся от виджета из PyQt5.QtWidgets и от класса с интерфейсом
-class MyWidget(QMainWindow, Ui_MainWindow):
+class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
@@ -222,12 +239,20 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
         self.difficulty_mode = 'easy'  # легкий режим по умолчанию
         self.user = "Гость"  # пользователь по умолчанию
-
         self.theme = "dark"  # тема по умолчанию
-        self.interface_binding()  # привязка частей интерфейса к функциям
 
-        self.is_program_change = False  # переменная для отслеживания изменения программой текста
-        self.is_stopwatch_start = False  # переменная для отслеживания начало старта секундомера
+        # переменные для отслеживания изменения программой текста и начала старта секундомера
+        self.is_program_change = False
+        self.is_stopwatch_start = False
+
+        # цвет для выделения правильного текста и неправильного текста
+        self.correct_color = GREEN
+        self.incorrect_color = RED
+
+        # загружаем текст
+        self.load_text(self.difficulty_mode)
+        # при изменении текста в entered_text вызвать функцию text_changed
+        self.entered_text.textChanged.connect(self.text_changed)
 
         # Создание секундомера
         self.stopwatch = QTimer(self)
@@ -236,13 +261,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.timeInterval = 100  # интервал вызова секундомера
         self.time_r = 0  # разница между начальным временем и текущем временем. Изначально равен 0
 
-        self.load_text(self.difficulty_mode)
-        # при изменении текста в entered_text вызвать функцию text_changed
-        self.entered_text.textChanged.connect(self.text_changed)
-        # цвет для выделения правильного текста
-        self.correct_color = GREEN
-        # цвет для выделения неправильного текста
-        self.incorrect_color = RED
+        self.interface_binding()  # привязка частей интерфейса к функциям
 
     # обработчик событий нажатия клавиш и мыши
     def keyPressEvent(self, event):
@@ -253,7 +272,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def start_again(self):
         self.is_program_change = True  # программа изменила текст
         self.reset_stopwatch()  # перезапустить секундомер
-        self.load_text(self.difficulty_mode)
+        self.load_text(self.difficulty_mode)  # ввести новый текст
         self.entered_text.setText("")  # обнулить вводимый текст
         self.is_program_change = False  # вернуться к исходному значению
 
@@ -278,19 +297,25 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # обработчик события изменения текста
     def text_changed(self):
-        if not self.is_program_change:
+        if not self.is_program_change:  # если пользователь ввел текст
             if not self.is_stopwatch_start:  # если таймер был не запущен, запустить его
                 self.start_stopwatch()
-            self.compare_texts()
+            self.compare_texts()  # начать сравнивать тексты
 
     # функция сравнения текстов из generated_text и entered_text
     def compare_texts(self):
+        # запоминаем положение курсора
         cursor = self.entered_text.textCursor()
-        font_size = 4
-        is_correct = True
+
         generated_text = self.generated_text.text()
         entered_text = self.entered_text.toPlainText()
+
+        font_size = 4  # размер текста
+        is_correct = True  # переменная для отслеживания корректности ввода
+
         html = ""
+
+        # перебор символов в entered_text
         for index, character in enumerate(entered_text):
             if index <= len(generated_text) - 1:
                 if generated_text[index] != character:
@@ -302,11 +327,16 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.is_program_change = True
         self.entered_text.setHtml(html)
         self.is_program_change = False
+
+        # возвращаем курсор на место, так как при setHtml его позиция обнуляется
         self.entered_text.setTextCursor(cursor)
+
+        # если пользователь весь текст правильно, то вызвать функций показа, загрузки записи и начать заново
         if is_correct and len(entered_text) == len(generated_text):
             self.show_and_load_recording()
             self.start_again()
 
+    # функция показа и загрузки записи
     def show_and_load_recording(self):
         # Создание курсора
         cur = self.con.cursor()
@@ -330,29 +360,29 @@ class MyWidget(QMainWindow, Ui_MainWindow):
                 WHERE mode='{self.difficulty_mode}'""").fetchall()[0][0]
 
         # Получение time через self.stopwatch_label.text()
-        time = self.stopwatch_label.text()
+        typing_time = self.stopwatch_label.text()
 
         # typing_speed = S / time * 60 сим/мин
-        typing_speed = len(self.generated_text.text()) / self.time_r * 60
+        typing_speed = round(len(self.generated_text.text()) / self.time_r * 60, 1)
 
         # добавляем запись в бд и показываем результат пользователю
-        self.load_recording(user_id, data, text_id, difficulty_id, time, typing_speed)
-        self.show_result(time, typing_speed)
+        self.load_recording(user_id, data, text_id, difficulty_id, typing_time, typing_speed)
+        self.show_result(typing_time, typing_speed)
 
-    def load_recording(self, user_id, data, text_id, difficulty_id, time, typing_speed):
+    def load_recording(self, user_id, data, text_id, difficulty_id, typing_time, typing_speed):
         # Создание курсора
         cur = self.con.cursor()
 
         que = f"""INSERT INTO Recordings(user_id, data, text_id, difficulty_id, time, typing_speed) 
-        VALUES ({user_id}, '{data}', {text_id}, {difficulty_id}, '{time}', {typing_speed})"""
+        VALUES ({user_id}, '{data}', {text_id}, {difficulty_id}, '{typing_time}', {typing_speed})"""
 
         cur.execute(que)
 
         self.con.commit()
 
     # функция показа результата пользователя
-    def show_result(self, time, typing_speed):
-        dialog = ResultsDialog(time, typing_speed, self.theme)
+    def show_result(self, typing_time, typing_speed):
+        dialog = ResultsDialog(typing_time, typing_speed, self.theme)
         dialog.show()
         dialog.exec()
 
@@ -362,7 +392,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.start_time = time.time()  # в качестве начального времени установить текущее время
         self.time_r = 0  # Обнулить разницу во времени
         self.stopwatch_label.setText('00:00')
-        self.stopwatch.start(self.timeInterval)  # запуск секундомера с итервалом timeInterval
+        self.stopwatch.start(self.timeInterval)  # запуск секундомера с интервалом timeInterval
 
     # сброс секундомера
     def reset_stopwatch(self):
@@ -386,8 +416,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             # создание строки для удобного показа времени
             minutes = str(minutes)
             seconds = str(seconds)
-            stopwatch = '0' * (2 - len(minutes)) + minutes + ':' + '0' * (2 - len(seconds)) + seconds
-            self.stopwatch_label.setText(stopwatch)
+            stopwatch_text = '0' * (2 - len(minutes)) + minutes + ':' + '0' * (2 - len(seconds)) + seconds
+            self.stopwatch_label.setText(stopwatch_text)
 
     # функция для привязки частей интерфейса к функциям
     def interface_binding(self):
@@ -417,14 +447,17 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.about_us.triggered.connect(self.show_about_us_window)
         self.about_project.triggered.connect(self.show_about_project_window)
 
+    # функция показа окна про разработчиков
     def show_about_us_window(self):
         self.about_us_window = AboutUsWindow(self.theme)
         self.about_us_window.show()
 
+    # функция показа окна про проект
     def show_about_project_window(self):
         self.about_project_window = AboutProjectWindow(self.theme)
         self.about_project_window.show()
 
+    # функция показа окна результата
     def show_recordings(self):
         self.recordings_window = RecordingsWindow(self.user, self.theme)
         self.recordings_window.show()
@@ -433,6 +466,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def change_theme(self, theme):
         if self.theme == theme:
             return
+
         self.theme = theme
         if theme == "light":
             self.set_light_theme()
@@ -536,27 +570,30 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # функция изменения сложности
     def change_difficulty(self, diff):
-        # если сложность не осталось такой же, то поменять текст в generated_text со сложностью diff
-        if self.difficulty_mode != diff:
-            self.difficulty_mode = diff
-            self.start_again()
-        # изменить сложность
+        # если сложность осталась такой же, то ничего не менять
+        if self.difficulty_mode == diff:
+            return
+
+        # начинаем заново, так как изменилась сложность
         self.difficulty_mode = diff
+        self.start_again()
 
     # функция регистрации пользователя
     def registration(self):
         # вызов диалогового окна
         username, ok_pressed = QInputDialog.getText(self, "Регистрация", "Введите имя пользователя:")
 
-        # если пользователь нажал на ОК, то добавить его в таблицу Users в БД
+        # если пользователь нажал на ОК, то добавить его в таблицу Users в БД и начать заново
         if ok_pressed:
             self.add_user(username)
             self.start_again()
 
-    # загрузка пользователя в БД
+    # добавление пользователя в БД
     def add_user(self, username):
+        # создаем курсор и выполняем запрос
         cur = self.con.cursor()
         users = map(lambda x: x[0], cur.execute("""SELECT nickname FROM Users""").fetchall())
+
         # если пользователь уже существует, то вызвать окно с ошибкой
         if username in users:
             error_message = QMessageBox(self)
@@ -567,32 +604,34 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             error_message.exec_()
             return
 
-        # поменять пользователя
-        self.user = username
-        # изменить ник отображаемый в окне
-        self.username_label.setText(username)
-
         # добавляем пользователя в таблицу Users из БД
         cur.execute(f"INSERT INTO Users(nickname) VALUES('{username}')")
 
         # зафиксировать изменения в БД
         self.con.commit()
 
+        # поменять пользователя и изменить ник отображаемый в окне
+        self.user = username
+        self.username_label.setText(username)
+
     # функция для входа в пользователя
     def login(self):
+        # создаем курсор
         cur = self.con.cursor()
 
-        # получение ника для входа
+        # получение ников для входа
         users = map(lambda x: x[0], cur.execute("""SELECT nickname FROM Users""").fetchall())
 
+        # вызываем диалоговое окно для выбора пользователя
         username, ok_pressed = QInputDialog.getItem(self, "Вход", "Выберите пользователя: ",
                                                     users, 1, False)
+
         # если пользователь нажал на ОК, то сменить пользователя
         if ok_pressed:
-            self.user = username  # смена пользователя
-            # изменить ник отображаемый в окне
+            # смена пользователя и изменить ник отображаемый в окне
+            self.user = username
             self.username_label.setText(username)
-            self.start_again()
+            self.start_again()  # начинаем заново, так как сменился пользователь
 
     # функция, которая вызывается, когда закрывается окно
     def closeEvent(self, *args, **kwargs):
@@ -600,15 +639,16 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.con.close()
 
 
+# окно для вывода результата пользователя
 class ResultsDialog(QDialog, Ui_Dialog):
-    def __init__(self, time, result, theme):
+    def __init__(self, typing_time, result, theme):
         super().__init__()  # конструктор родительского класса
         # Вызываем метод для загрузки интерфейса из класса Ui_Dialog,
         self.setupUi(self)
         self.change_theme(theme)
         self.button_box.accepted.connect(self.accept_data)  # привязка функции кнопки ОК
-        self.time_label.setText(f"Общее время: {time}")
-        self.cpm_label.setText(f"Символов в минуту: {result:.{1}f}")
+        self.time_label.setText(f"Общее время: {typing_time}")
+        self.cpm_label.setText(f"Символов в минуту: {result}")
         img_num = randint(1, 2)
         try:
             if result <= 100:
@@ -649,6 +689,7 @@ class ResultsDialog(QDialog, Ui_Dialog):
             error_message.exec_()
 
 
+# окно для вывода информаций о разработчиках
 class AboutUsWindow(QWidget, about.Ui_Form):
     def __init__(self, theme):
         super().__init__()  # конструктор родительского класса
@@ -672,6 +713,7 @@ class AboutUsWindow(QWidget, about.Ui_Form):
             error_message.exec_()
 
 
+# окно для вывода информаций о проекте
 class AboutProjectWindow(QWidget, about.Ui_Form):
     def __init__(self, theme):
         super().__init__()  # конструктор родительского класса
@@ -698,8 +740,8 @@ if __name__ == '__main__':
     # Создание класса приложения PyQT
     app = QApplication(sys.argv)
     # создание экземпляра класса MyWidget
-    ex = MyWidget()
+    main_window = MainWindow()
     # показ экземпляра
-    ex.show()
+    main_window.show()
     # при завершение исполнения QApplication завершить программу
     sys.exit(app.exec())

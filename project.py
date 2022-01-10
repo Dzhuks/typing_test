@@ -14,6 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
+        MainWindow.setEnabled(True)
         MainWindow.resize(800, 600)
         MainWindow.setStyleSheet("background-color: rgb(56, 56, 56);\n"
 "color: white;")
@@ -59,6 +60,7 @@ class Ui_MainWindow(object):
 "border-color: rgb(255, 255, 0);")
         self.entered_text.setObjectName("entered_text")
         self.verticalLayout.addWidget(self.entered_text)
+        self.verticalLayout.setStretch(0, 3)
         self.verticalLayout.setStretch(1, 1)
         self.verticalLayout.setStretch(2, 3)
         self.stopwatch_label = QtWidgets.QLabel(self.centralwidget)
@@ -91,10 +93,18 @@ class Ui_MainWindow(object):
         self.difficulty_setting.setObjectName("difficulty_setting")
         self.user_setting = QtWidgets.QMenu(self.settings_menu)
         self.user_setting.setObjectName("user_setting")
-        self.about_menu = QtWidgets.QMenu(self.menubar)
-        self.about_menu.setObjectName("about_menu")
+        self.about_us_menu = QtWidgets.QMenu(self.menubar)
+        self.about_us_menu.setObjectName("about_us_menu")
+        self.about_project_menu = QtWidgets.QMenu(self.menubar)
+        self.about_project_menu.setObjectName("about_project_menu")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setEnabled(True)
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.statusbar.setFont(font)
+        self.statusbar.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.statusbar.setStyleSheet("")
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.dark_theme = QtWidgets.QAction(MainWindow)
@@ -143,14 +153,15 @@ class Ui_MainWindow(object):
         self.settings_menu.addAction(self.user_setting.menuAction())
         self.settings_menu.addAction(self.results_menu)
         self.menubar.addAction(self.settings_menu.menuAction())
-        self.menubar.addAction(self.about_menu.menuAction())
+        self.menubar.addAction(self.about_us_menu.menuAction())
+        self.menubar.addAction(self.about_project_menu.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Клавиатурный тренажер"))
         self.hint_label.setText(_translate("MainWindow", "Нажмите Esc чтобы начать заново"))
         self.entered_text.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -163,7 +174,8 @@ class Ui_MainWindow(object):
         self.theme_setting.setTitle(_translate("MainWindow", "Тема"))
         self.difficulty_setting.setTitle(_translate("MainWindow", "Сложность"))
         self.user_setting.setTitle(_translate("MainWindow", "Пользователь"))
-        self.about_menu.setTitle(_translate("MainWindow", "О разработчиках"))
+        self.about_us_menu.setTitle(_translate("MainWindow", "О разработчиках"))
+        self.about_project_menu.setTitle(_translate("MainWindow", "О проекте"))
         self.dark_theme.setText(_translate("MainWindow", "Темная (по умолчанию)"))
         self.light_theme.setText(_translate("MainWindow", "Светлая"))
         self.easy_mode.setText(_translate("MainWindow", "Легкая"))

@@ -15,9 +15,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(489, 300)
-        Dialog.setStyleSheet("background-color: rgb(56, 56, 56);\n"
-"color: rgb(240, 223, 28);\n"
-"")
+        Dialog.setStyleSheet("")
         self.button_box = QtWidgets.QDialogButtonBox(Dialog)
         self.button_box.setGeometry(QtCore.QRect(40, 240, 411, 51))
         self.button_box.setLayoutDirection(QtCore.Qt.LeftToRight)
@@ -65,7 +63,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        Dialog.setWindowTitle(_translate("Dialog", "Результат"))
         self.comment_label.setText(_translate("Dialog", "Отличный результат!"))
         self.cpm_label.setText(_translate("Dialog", "Символов в минуту: 250"))
         self.time_label.setText(_translate("Dialog", "Общее время:1:20"))

@@ -87,7 +87,7 @@ def create_item(text, flags):
 class RecordingsWindow(QWidget, Ui_Form):
     def __init__(self, user, theme):
         super().__init__()  # конструктор родительского класса
-        # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
+        # Вызываем метод для загрузки интерфейса из класса Ui_Form,
         self.setupUi(self)
 
         self.con = sqlite3.connect(DATABASE)
@@ -338,6 +338,8 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     def show_result(self, time, typing_speed):
         self.stopwatch.stop()  # остановка секундомера
         dialog = ResultsDialog(time, typing_speed, self.theme)
+        dialog.show()
+        dialog.exec()
 
     # запуск секундомера
     def start_stopwatch(self):
@@ -377,8 +379,19 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         # Создание курсора
         cur = self.con.cursor()
 
+        users = ()
         # Выполнение запроса и получение всех результатов
-        users = cur.execute("""SELECT user_id, nickname FROM Users""").fetchall()
+        try:  # пытаемся получить данные из соединения
+            users = cur.execute("""SELECT user_id, nickname FROM Users""").fetchall()
+        except sqlite3.OperationalError:  # если база данных отсутствует
+            error_message = QMessageBox(self)  # создаем окно с сообщением об ошибке
+            error_message.setIcon(QMessageBox.Critical)
+            error_message.setText("Отсутствует база данных!")
+            error_message.setInformativeText("Проверьте целостность программы")
+            error_message.setWindowTitle("Ошибка загрузки")
+            error_message.exec_()
+            self.close()  # закрываем окно
+            exit()  # досрочно выходим из программы
 
         # если сохраненных пользователей ноль, то пользователь будет Гостем
         if len(users) == 0:
@@ -390,13 +403,13 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     # функция для привязки частей интерфейса к функциям
     def interface_binding(self):
         # настройки темы
-        self.dark_theme.triggered.connect(self.set_dark_theme)
-        self.light_theme.triggered.connect(self.set_light_theme)
-        self.ocean_theme.triggered.connect(self.set_ocean_theme)
-        self.violet_theme.triggered.connect(self.set_violet_theme)
-        self.pastel_theme.triggered.connect(self.set_pastel_theme)
-        self.forest_theme.triggered.connect(self.set_forest_theme)
-        self.glamour_theme.triggered.connect(self.set_glamour_theme)
+        self.dark_theme.triggered.connect(lambda: self.change_theme("dark"))
+        self.light_theme.triggered.connect(lambda: self.change_theme("light"))
+        self.ocean_theme.triggered.connect(lambda: self.change_theme("ocean"))
+        self.violet_theme.triggered.connect(lambda: self.change_theme("violet"))
+        self.pastel_theme.triggered.connect(lambda: self.change_theme("pastel"))
+        self.forest_theme.triggered.connect(lambda: self.change_theme("forest"))
+        self.glamour_theme.triggered.connect(lambda: self.change_theme("glamour"))
 
         # настройки сложности
         self.easy_mode.triggered.connect(lambda: self.change_difficulty('easy'))
@@ -412,119 +425,112 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.results_menu.triggered.connect(self.show_recordings)
 
     def show_recordings(self):
-        recordings_win = RecordingsWindow(self.user, self.theme)
-        recordings_win.show()
-        recordings_win.exec()
+        self.rec_win = RecordingsWindow(self.user, self.theme)
+        self.rec_win.show()
+
+    # функция смены темы приложения
+    def change_theme(self, theme):
+        if self.theme != theme:
+            self.theme = theme
+            if theme == "light":
+                self.set_light_theme()
+            if theme == "dark":
+                self.set_dark_theme()
+            if theme == "ocean":
+                self.set_ocean_theme()
+            if theme == "violet":
+                self.set_violet_theme()
+            if theme == "pastel":
+                self.set_pastel_theme()
+            if theme == "forest":
+                self.set_forest_theme()
+            if theme == "glamour":
+                self.set_glamour_theme()
+            self.compare_texts()
 
     # функция установки светлой темы
     def set_light_theme(self):
-        # если светлая тема еще не установлена
-        if self.theme != "light":
-            self.theme = "light"
-            self.correct_color = GREEN
-            self.incorrect_color = RED
-            self.setStyleSheet("color: black")
-            self.generated_text.setStyleSheet(f"color: {BLUE};")
-            self.entered_text.setStyleSheet(f"color: {GREEN};")
-            self.hint_label.setStyleSheet(f"color: {GRAY2};")
-            self.stopwatch_label.setStyleSheet(f"color: {BLUE};")
-            self.username_label.setStyleSheet(f"color: {BLUE}")
-            self.menubar.setStyleSheet("color: black;")
-            self.compare_texts()
+        self.correct_color = GREEN
+        self.incorrect_color = RED
+        self.setStyleSheet("color: black")
+        self.generated_text.setStyleSheet(f"color: {BLUE};")
+        self.entered_text.setStyleSheet(f"color: {GREEN};")
+        self.hint_label.setStyleSheet(f"color: {GRAY2};")
+        self.stopwatch_label.setStyleSheet(f"color: {BLUE};")
+        self.username_label.setStyleSheet(f"color: {BLUE}")
+        self.menubar.setStyleSheet("color: black;")
 
     # функция установки темной темы
     def set_dark_theme(self):
-        # если темная тема еще не установлена
-        if self.theme != "dark":
-            self.theme = "dark"
-            self.correct_color = GREEN
-            self.incorrect_color = RED
-            self.setStyleSheet(f"background-color: {GRAY1}; color: white;")
-            self.generated_text.setStyleSheet(f"color: {YELLOW};")
-            self.entered_text.setStyleSheet(f"color: {GREEN};")
-            self.hint_label.setStyleSheet(f"color: {GRAY2};")
-            self.stopwatch_label.setStyleSheet(f"color: {YELLOW};")
-            self.username_label.setStyleSheet(f"color: {YELLOW}")
-            self.menubar.setStyleSheet("color: white;")
-            self.compare_texts()
+        self.correct_color = GREEN
+        self.incorrect_color = RED
+        self.setStyleSheet(f"background-color: {GRAY1}; color: white;")
+        self.generated_text.setStyleSheet(f"color: {YELLOW};")
+        self.entered_text.setStyleSheet(f"color: {GREEN};")
+        self.hint_label.setStyleSheet(f"color: {GRAY2};")
+        self.stopwatch_label.setStyleSheet(f"color: {YELLOW};")
+        self.username_label.setStyleSheet(f"color: {YELLOW}")
+        self.menubar.setStyleSheet("color: white;")
 
     # функция установки океанной темы
     def set_ocean_theme(self):
-        # если океанная тема еще не установлена
-        if self.theme != "ocean":
-            self.theme = "ocean"
-            self.correct_color = OCEAN_GREEN
-            self.incorrect_color = OCEAN_RED
-            self.setStyleSheet(f"background-color: {OCEAN_BLUE}; color: white;")
-            self.generated_text.setStyleSheet(f"color: {OCEAN_YELLOW};")
-            self.entered_text.setStyleSheet(f"color: {OCEAN_GREEN};")
-            self.hint_label.setStyleSheet(f"color: {GRAY2};")
-            self.stopwatch_label.setStyleSheet(f"color: {OCEAN_YELLOW};")
-            self.username_label.setStyleSheet(f"color: {OCEAN_YELLOW}")
-            self.menubar.setStyleSheet("color: white;")
-            self.compare_texts()
+        self.correct_color = OCEAN_GREEN
+        self.incorrect_color = OCEAN_RED
+        self.setStyleSheet(f"background-color: {OCEAN_BLUE}; color: white;")
+        self.generated_text.setStyleSheet(f"color: {OCEAN_YELLOW};")
+        self.entered_text.setStyleSheet(f"color: {OCEAN_GREEN};")
+        self.hint_label.setStyleSheet(f"color: {GRAY2};")
+        self.stopwatch_label.setStyleSheet(f"color: {OCEAN_YELLOW};")
+        self.username_label.setStyleSheet(f"color: {OCEAN_YELLOW}")
+        self.menubar.setStyleSheet("color: white;")
 
     # функция установки сиреневой темы
     def set_pastel_theme(self):
-        # если сиреневая тема еще не установлена
-        if self.theme != "pastel":
-            self.theme = "pastel"
-            self.correct_color = PASTEL_GREEN
-            self.incorrect_color = PASTEL_RED
-            self.setStyleSheet(f"background-color: {PASTEL_PURPLE}; color: white;")
-            self.generated_text.setStyleSheet(f"color: {PASTEL_BLUE};")
-            self.entered_text.setStyleSheet(f"color: {PASTEL_GREEN};")
-            self.hint_label.setStyleSheet(f"color: {GRAY2};")
-            self.stopwatch_label.setStyleSheet(f"color: {PASTEL_BLUE};")
-            self.username_label.setStyleSheet(f"color: {PASTEL_BLUE}")
-            self.menubar.setStyleSheet("color: white;")
-            self.compare_texts()
+        self.correct_color = PASTEL_GREEN
+        self.incorrect_color = PASTEL_RED
+        self.setStyleSheet(f"background-color: {PASTEL_PURPLE}; color: white;")
+        self.generated_text.setStyleSheet(f"color: {PASTEL_BLUE};")
+        self.entered_text.setStyleSheet(f"color: {PASTEL_GREEN};")
+        self.hint_label.setStyleSheet(f"color: {GRAY2};")
+        self.stopwatch_label.setStyleSheet(f"color: {PASTEL_BLUE};")
+        self.username_label.setStyleSheet(f"color: {PASTEL_BLUE}")
+        self.menubar.setStyleSheet("color: white;")
 
     # функция установки фиолетовой темы
     def set_violet_theme(self):
-        # если фиолетовая тема еще не установлена
-        if self.theme != "violet":
-            self.theme = "violet"
-            self.correct_color = GREEN
-            self.incorrect_color = RED
-            self.setStyleSheet(f"background-color: {PURPLE}; color: white;")
-            self.generated_text.setStyleSheet(f"color: {YELLOW};")
-            self.entered_text.setStyleSheet(f"color: {GREEN};")
-            self.hint_label.setStyleSheet(f"color: {GRAY2};")
-            self.stopwatch_label.setStyleSheet(f"color: {YELLOW};")
-            self.username_label.setStyleSheet(f"color: {YELLOW}")
-            self.menubar.setStyleSheet("color: white;")
-            self.compare_texts()
+        self.correct_color = GREEN
+        self.incorrect_color = RED
+        self.setStyleSheet(f"background-color: {PURPLE}; color: white;")
+        self.generated_text.setStyleSheet(f"color: {YELLOW};")
+        self.entered_text.setStyleSheet(f"color: {GREEN};")
+        self.hint_label.setStyleSheet(f"color: {GRAY2};")
+        self.stopwatch_label.setStyleSheet(f"color: {YELLOW};")
+        self.username_label.setStyleSheet(f"color: {YELLOW}")
+        self.menubar.setStyleSheet("color: white;")
 
     # функция установки лесной темы
     def set_forest_theme(self):
-        # если лесная тема еще не установлена
-        if self.theme != "forest":
-            self.theme = "forest"
-            self.correct_color = FOREST_LIGHT_GREEN
-            self.incorrect_color = FOREST_RED
-            self.setStyleSheet(f"background-color: {FOREST_GREEN}; color: white;")
-            self.generated_text.setStyleSheet(f"color: {FOREST_BROWN};")
-            self.entered_text.setStyleSheet(f"color: {FOREST_LIGHT_GREEN};")
-            self.hint_label.setStyleSheet(f"color: {GRAY2};")
-            self.stopwatch_label.setStyleSheet(f"color: {FOREST_BROWN};")
-            self.username_label.setStyleSheet(f"color: {FOREST_BROWN}")
-            self.menubar.setStyleSheet("color: white;")
-            self.compare_texts()
+        self.correct_color = FOREST_LIGHT_GREEN
+        self.incorrect_color = FOREST_RED
+        self.setStyleSheet(f"background-color: {FOREST_GREEN}; color: white;")
+        self.generated_text.setStyleSheet(f"color: {FOREST_BROWN};")
+        self.entered_text.setStyleSheet(f"color: {FOREST_LIGHT_GREEN};")
+        self.hint_label.setStyleSheet(f"color: {GRAY2};")
+        self.stopwatch_label.setStyleSheet(f"color: {FOREST_BROWN};")
+        self.username_label.setStyleSheet(f"color: {FOREST_BROWN}")
+        self.menubar.setStyleSheet("color: white;")
 
     # функция установки гламурной темы
     def set_glamour_theme(self):
-        # если гламурная тема еще не установлена
-        if self.theme != "glamour":
-            self.theme = "glamour"
-            self.setStyleSheet(f"background-color: {GLAMOUR_PINK}; color: white;")
-            self.generated_text.setStyleSheet(f"color: white;")
-            self.entered_text.setStyleSheet(f"color: {GLAMOUR_BLUE};")
-            self.hint_label.setStyleSheet(f"color: {GLAMOUR_GRAY};")
-            self.stopwatch_label.setStyleSheet(f"color: white;")
-            self.username_label.setStyleSheet(f"color: white")
-            self.menubar.setStyleSheet("color: white;")
-            self.compare_texts()
+        self.correct_color = GLAMOUR_BLUE
+        self.incorrect_color = GLAMOUR_RED
+        self.setStyleSheet(f"background-color: {GLAMOUR_PINK}; color: white;")
+        self.generated_text.setStyleSheet(f"color: white;")
+        self.entered_text.setStyleSheet(f"color: {GLAMOUR_BLUE};")
+        self.hint_label.setStyleSheet(f"color: {GLAMOUR_GRAY};")
+        self.stopwatch_label.setStyleSheet(f"color: white;")
+        self.username_label.setStyleSheet(f"color: white")
+        self.menubar.setStyleSheet("color: white;")
 
     # функция изменения сложности
     def change_difficulty(self, diff):
@@ -543,7 +549,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         if ok_pressed:
             # если пользователь уже существует, то вызвать окно с ошибкой
             cur = self.con.cursor()
-            users = cur.execute("""SELECT nickname FROM Users""")
+            users = map(lambda x: x[0], cur.execute("""SELECT nickname FROM Users""").fetchall())
             if username in users:
                 error_message = QMessageBox(self)
                 error_message.setIcon(QMessageBox.Critical)
@@ -605,7 +611,7 @@ class ResultsDialog(QDialog, Ui_Dialog):
             self.comment_label.setText("Для начала неплохо!")
             img = f"data\\bad{img_num}.jpeg"
         if 200 < result <= 350:
-            self.comment_label.setText("Отличний результат!")
+            self.comment_label.setText("Отличный результат!")
             img = f"data\\good{img_num}.jpeg"
         else:
             self.comment_label.setText("Превосходно!")
@@ -613,8 +619,6 @@ class ResultsDialog(QDialog, Ui_Dialog):
         pixmap = QPixmap(img)
         pixmap = pixmap.scaled(191, 191)
         self.image_label.setPixmap(pixmap)  # вставка картинки в label
-        self.show()
-        self.exec()
 
     # функция для закрытия окна на нажатие ОК
     def accept_data(self):

@@ -261,7 +261,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="insane_mode">
    <property name="text">
-    <string>Безумная (в планах)</string>
+    <string>Безумная</string>
    </property>
   </action>
   <action name="register_user">

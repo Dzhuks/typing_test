@@ -183,7 +183,7 @@ class Ui_MainWindow(object):
         self.easy_mode.setText(_translate("MainWindow", "Легкая"))
         self.normal_mode.setText(_translate("MainWindow", "Средняя"))
         self.hard_mode.setText(_translate("MainWindow", "Сложная"))
-        self.insane_mode.setText(_translate("MainWindow", "Безумная (в планах)"))
+        self.insane_mode.setText(_translate("MainWindow", "Безумная"))
         self.register_user.setText(_translate("MainWindow", "Регистрация"))
         self.login_user.setText(_translate("MainWindow", "Войти"))
         self.results_menu.setText(_translate("MainWindow", "Результаты"))

@@ -15,13 +15,15 @@ class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(541, 422)
+        Form.setStyleSheet("")
         self.label = QtWidgets.QLabel(Form)
         self.label.setGeometry(QtCore.QRect(10, 10, 521, 391))
         font = QtGui.QFont()
-        font.setPointSize(18)
+        font.setFamily("Calibri")
+        font.setPointSize(24)
         self.label.setFont(font)
+        self.label.setStyleSheet("")
         self.label.setLocale(QtCore.QLocale(QtCore.QLocale.Russian, QtCore.QLocale.Russia))
-        self.label.setText("")
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
@@ -32,3 +34,4 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
+        self.label.setText(_translate("Form", "Разработчики этого проекта - участники \"Яндекс.Лицей\", ученики 9 класса ФМН НИШ Хусаинов Марат и Сейдазымов Адиль"))

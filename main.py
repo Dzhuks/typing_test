@@ -69,14 +69,18 @@ class RecordingsWindow(QWidget, Ui_Form):
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         self.setupUi(self)
 
-        # связываемся с БД
-        self.con = sqlite3.connect(DATABASE)
+        try:
+            # связываемся с БД
+            self.con = sqlite3.connect(DATABASE)
+        except sqlite3.OperationalError:
+            sys.exit()
 
         self.user = user
 
         # столбцы в БД и заголовки для отображаемой таблицы
-        self.titles = ['record_id', 'user', 'data', 'text', 'mode', 'time', 'typing_speed']
-        self.columns = ['record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed']
+        self.titles = ('id рекорда', 'Пользователь', 'Дата', 'Вводимый текст', 'Сложность', 'Время печатания',
+                       'Скорость печатания в сим/мин')
+        self.columns = ('record_id', 'user_id', 'data', 'text_id', 'difficulty_id', 'time', 'typing_speed')
 
         self.change_theme(theme)  # устанавливаем тему
         self.username_label.setText(self.user)  # устанавливаем пользователя
@@ -127,6 +131,7 @@ class RecordingsWindow(QWidget, Ui_Form):
 
         # делаем таблицу нередактируемой
         self.recordings_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.recordings_table.resizeColumnsToContents()
 
     def delete_elem(self):
         # если пользователь ничего не выбрал, то вызвать ошибку
@@ -172,7 +177,7 @@ class RecordingsWindow(QWidget, Ui_Form):
 
     def show_dialog(self):
         # вызов диалогового окна
-        filename, ok_pressed = QInputDialog.getText(self, "Регистрация", "Введите имя файла:")
+        filename, ok_pressed = QInputDialog.getText(self, "Конвертирование в csv", "Введите имя файла:")
         # если пользователь нажал на ОК, то конвертируем результат в csv файл
         if ok_pressed:
             self.convert_to_csv(filename)
@@ -234,8 +239,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Вызываем метод для загрузки интерфейса из класса Ui_MainWindow,
         self.setupUi(self)
 
-        # связываемся с базой данных trainer_db.db
-        self.con = sqlite3.connect(DATABASE)
+        try:
+            # связываемся с базой данных trainer_db.db
+            self.con = sqlite3.connect(DATABASE)
+        except sqlite3.OperationalError:
+            sys.exit()
 
         self.difficulty_mode = 'easy'  # легкий режим по умолчанию
         self.user = "Гость"  # пользователь по умолчанию
@@ -333,6 +341,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # если пользователь весь текст правильно, то вызвать функций показа, загрузки записи и начать заново
         if is_correct and len(entered_text) == len(generated_text):
+            self.stopwatch.stop()
             self.show_and_load_recording()
             self.start_again()
 

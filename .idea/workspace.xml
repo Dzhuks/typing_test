@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="95e1e91d-7452-4b12-a10e-bcb3539e57a7" name="Changes" comment="Create requirements.txt file">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+    <list default="true" id="95e1e91d-7452-4b12-a10e-bcb3539e57a7" name="Changes" comment="Final project">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/trainer_db.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/trainer_db.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
@@ -327,7 +326,14 @@
       <option name="project" value="LOCAL" />
       <updated>1641807107114</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="Final project">
+      <created>1641884353872</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1641884353872</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -352,7 +358,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/main" />
+                        <option value="Adil" />
                       </list>
                     </value>
                   </entry>
@@ -407,11 +413,11 @@
     <MESSAGE value="Change data in Recordings. Now it char. So I change code in data = str(datetime.datetime.now().date())" />
     <MESSAGE value="Fixed stupid code" />
     <MESSAGE value="Fixed change_theme. Add THEME constant" />
-    <MESSAGE value="Final project" />
     <MESSAGE value="Clean database" />
     <MESSAGE value="Create exe file" />
     <MESSAGE value="Create requirements.txt file" />
-    <option name="LAST_COMMIT_MESSAGE" value="Create requirements.txt file" />
+    <MESSAGE value="Final project" />
+    <option name="LAST_COMMIT_MESSAGE" value="Final project" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

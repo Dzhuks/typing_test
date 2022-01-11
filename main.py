@@ -15,7 +15,6 @@ from PyQt5.QtCore import QTimer, Qt
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtGui import QTextCursor, QPixmap
 
-
 # адаптация к экранам с высоким разрешением (HiRes)
 if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
@@ -63,13 +62,13 @@ def convert_sql_to_csv(name, que):  # в функцию передаем имя 
     # Создание курсора
     cur = con.cursor()
 
-    # получаем данные из бд путем запроса
+    # получаем данные из БД путем запроса
     data = cur.execute(que).fetchall()
 
     # ключи csv файла
     titles = [description[0] for description in cur.description]
 
-    with open(name, 'w+', newline='') as csv_file:  # открываем файл, если он есть, а иначе создаем его
+    with open(name, 'w+', newline='') as csv_file:  # открываем файл если он есть, иначе создаем его
         writer = csv.DictWriter(
             csv_file, fieldnames=titles,
             delimiter=';', quoting=csv.QUOTE_NONNUMERIC)  # объект для записи (writer)
@@ -97,7 +96,7 @@ class RecordingsWindow(QWidget, Ui_Form):
 
         self.change_theme(theme)  # устанавливаем тему
         self.username_label.setText(user)  # устанавливаем пользователя
-        self.load_table(user)  # заргужаем таблицу
+        self.load_table(user)  # загружаем таблицу
         self.delete_btn.clicked.connect(self.delete_elem)
 
     def load_table(self, user):
@@ -108,7 +107,7 @@ class RecordingsWindow(QWidget, Ui_Form):
         # Создание курсора
         cur = self.con.cursor()
 
-        # получаем данные из бд путем запроса
+        # получаем данные из БД путем запроса
         result = cur.execute(f"""
         SELECT {', '.join(columns)} FROM Recordings
             WHERE user_id=(
@@ -123,7 +122,7 @@ class RecordingsWindow(QWidget, Ui_Form):
         # перебираем элементы
         for i, row in enumerate(result):
             for j, col in enumerate(row):
-                # подменяем элемент с id на его значение
+                # меняем элемент с id на его значение
                 if columns[j] == 'user_id':
                     col = user
                 elif columns[j] == 'text_id':
@@ -216,7 +215,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         # Создание секундомера
         self.stopwatch = QTimer(self)
         self.stopwatch.timeout.connect(self.show_stopwatch)
-        self.start_time = 0  # время начало ввода
+        self.start_time = 0  # время начала ввода
         self.timeInterval = 100  # интервал вызова секундомера
         self.time_r = 0  # разница между начальным временем и текущем временем. Изначально равен 0
 
@@ -230,7 +229,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # обработчик событий нажатия клавиш и мыши
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:  # при нажатие на esc начать заново
+        if event.key() == Qt.Key_Escape:  # при нажатии на esc начать заново
             self.start_again()
 
     # начать заново ввод текста
@@ -253,11 +252,11 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             WHERE mode = '{difficult}')
         """).fetchall()
 
-        # выбирание случайного текста, пока он совпадает с текстом в generated_text
+        # выбор случайного текста пока он совпадает с текстом в generated_text
         text = choice(texts)[0]
         while self.generated_text.text() == text:
             text = choice(texts)[0]
-        self.generated_text.setText(text)  # вставить новой текст в generated_text
+        self.generated_text.setText(text)  # вставить новый текст в generated_text
 
         # начать заново, так как текст в generated_text изменился
         self.start_again()
@@ -265,7 +264,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
     # обработчик события изменения текста
     def text_changed(self):
         if not self.is_program_change:
-            if not self.is_stopwatch_start:  # если таймер был не запущен, запустить его
+            if not self.is_stopwatch_start:  # если таймер не был запущен, запустить его
                 self.start_stopwatch()
             self.compare_texts()
 
@@ -297,7 +296,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         # Создание курсора
         cur = self.con.cursor()
 
-        # Получение user_id путем запроса из таблицы User
+        # Получение user_id путем запроса из таблицы Users
         user_id = cur.execute(f"""
             SELECT user_id FROM Users 
                 WHERE nickname='{self.user}'""").fetchall()[0][0]
@@ -310,7 +309,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             SELECT text_id FROM Texts
                 WHERE text='{self.generated_text.text()}'""").fetchall()[0][0]
 
-        # Получение difficulty_id путем запроса из таблицы Texts
+        # Получение difficulty_id путем запроса из таблицы Difficults
         difficulty_id = cur.execute(f"""
             SELECT difficulty_id FROM Difficults
                 WHERE mode='{self.difficulty_mode}'""").fetchall()[0][0]
@@ -321,7 +320,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         # typing_speed = S / time * 60 сим/мин
         typing_speed = len(self.generated_text.text()) / self.time_r * 60
 
-        # добавляем запись в бд и показываем результат пользователю
+        # добавляем запись в БД и показываем результат пользователю
         self.load_recording(user_id, data, text_id, difficulty_id, time, typing_speed)
         self.show_result(time, typing_speed)
 
@@ -349,7 +348,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.start_time = time.time()  # в качестве начального времени установить текущее время
         self.time_r = 0  # Обнулить разницу во времени
         self.stopwatch_label.setText('00:00')
-        self.stopwatch.start(self.timeInterval)  # запуск секундомера с итервалом timeInterval
+        self.stopwatch.start(self.timeInterval)  # запуск секундомера с интервалом timeInterval
 
     # сброс секундомера
     def reset_stopwatch(self):
@@ -395,7 +394,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
             self.close()  # закрываем окно
             exit()  # досрочно выходим из программы
 
-        # если сохраненных пользователей ноль, то пользователь будет Гостем
+        # если сохраненных пользователей нет, то пользователь будет Гостем
         if len(users) == 0:
             # добавление в таблицу Users Гостя
             cur.execute("INSERT INTO Users(nickname) VALUES('Гость')")
@@ -548,7 +547,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
 
     # функция изменения сложности
     def change_difficulty(self, diff):
-        # если сложность не осталось такой же, то поменять текст в generated_text со сложностью diff
+        # если сложность не осталась такой же, то поменять текст в generated_text со сложностью diff
         if self.difficulty_mode != diff:
             self.load_text(diff)
         # изменить сложность
@@ -670,7 +669,7 @@ class ResultsDialog(QDialog, Ui_Dialog):
 class AboutUsWindow(QWidget, about.Ui_Form):
     def __init__(self, theme):
         super().__init__()  # конструктор родительского класса
-        # Вызываем метод для загрузки интерфейса из класса Ui_Form,
+        # Вызываем метод для загрузки интерфейса из класса about.Ui_Form,
         self.setupUi(self)
         self.change_theme(theme)
         self.setWindowTitle("О разработчиках")
@@ -709,7 +708,7 @@ class AboutUsWindow(QWidget, about.Ui_Form):
 class AboutProjectWindow(QWidget, about.Ui_Form):
     def __init__(self, theme):
         super().__init__()  # конструктор родительского класса
-        # Вызываем метод для загрузки интерфейса из класса Ui_Form,
+        # Вызываем метод для загрузки интерфейса из класса about.Ui_Form,
         self.setupUi(self)
         self.change_theme(theme)
         self.setWindowTitle("О проекте")
@@ -752,5 +751,5 @@ if __name__ == '__main__':
     ex = MyWidget()
     # показ экземпляра
     ex.show()
-    # при завершение исполнения QApplication завершить программу
+    # при завершении исполнения QApplication завершить программу
     sys.exit(app.exec())

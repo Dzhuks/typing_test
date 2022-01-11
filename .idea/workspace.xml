@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="95e1e91d-7452-4b12-a10e-bcb3539e57a7" name="Changes" comment="Clean database" />
+    <list default="true" id="95e1e91d-7452-4b12-a10e-bcb3539e57a7" name="Changes" comment="Create requirements.txt file">
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/trainer_db.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/trainer_db.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -34,7 +39,9 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/requirements.txt" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/README.md" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/main.py" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="22yHks2Ic1q8OihbHNDB1kgUKAr" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -45,8 +52,9 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Project/Yandex_second_course" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="run.code.analysis.last.selected.profile" value="aDefault" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
   </component>
   <component name="ReaderModeSettings">
     <option name="enabled" value="false" />
@@ -305,7 +313,21 @@
       <option name="project" value="LOCAL" />
       <updated>1641806642395</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Create exe file">
+      <created>1641806877882</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1641806877882</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Create requirements.txt file">
+      <created>1641807107114</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1641807107114</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -330,7 +352,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/Marat" />
+                        <option value="origin/main" />
                       </list>
                     </value>
                   </entry>
@@ -364,8 +386,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Processing of high-resolution screens (HiRes)" />
-    <MESSAGE value="Updating the stopwatch, calling the signal, adding comments" />
     <MESSAGE value="Add compare_texts function and fixed problem with cursor when it called." />
     <MESSAGE value="Add stub function show_result calling when user enter all right" />
     <MESSAGE value="Fixed compare_texts function" />
@@ -389,7 +409,9 @@
     <MESSAGE value="Fixed change_theme. Add THEME constant" />
     <MESSAGE value="Final project" />
     <MESSAGE value="Clean database" />
-    <option name="LAST_COMMIT_MESSAGE" value="Clean database" />
+    <MESSAGE value="Create exe file" />
+    <MESSAGE value="Create requirements.txt file" />
+    <option name="LAST_COMMIT_MESSAGE" value="Create requirements.txt file" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

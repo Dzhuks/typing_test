@@ -698,7 +698,7 @@ class AboutUsWindow(QWidget, about.Ui_Form):
         self.change_theme(theme)
         self.setWindowTitle("О разработчиках")
         self.label.setText("""Разработчики этого проекта - участники \"Яндекс.Лицей\", \
-ученики 9 класса ФМН НИШ Хусаинов Марат и Сейдазымов Адиль""")
+ученики 9"A" класса ФМН НИШ: Хусаинов Марат и Сейдазымов Адиль""")
 
     def change_theme(self, theme):
         try:
@@ -721,8 +721,9 @@ class AboutProjectWindow(QWidget, about.Ui_Form):
         self.setupUi(self)
         self.change_theme(theme)
         self.setWindowTitle("О проекте")
-        self.label.setText("""""")
-
+        self.label.setText("""Приложение для определения и тренировки скорости печати, \
+разработанное на языке Python с применением библиотеки PyQt5, имеющее широкий функционал и простой интерфейс""")
+        
     def change_theme(self, theme):
         try:
             bg_color, text_color = THEMES[theme]

@@ -4,11 +4,11 @@ import sys
 import time
 import csv
 import datetime
-import about
+from design import about
 from random import choice, randint
-from project import Ui_MainWindow
-from res_dialog import Ui_Dialog
-from recordings_window import Ui_Form
+from design.project import Ui_MainWindow
+from design.res_dialog import Ui_Dialog
+from design.recordings_window import Ui_Form
 from PyQt5.QtWidgets import QDialog, QInputDialog, QMessageBox
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QTableWidgetItem
 from PyQt5.QtCore import QTimer, Qt
